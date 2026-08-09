@@ -1,0 +1,479 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#17181a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Money Map">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Money Map</title>
+<style>
+:root{--bg:#f4f5f7;--card:#fff;--ink:#17181a;--muted:#74777d;--line:#e7e8eb;--good:#198754;--warn:#c98a1f;--danger:#d64545}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif}
+.phone{max-width:430px;margin:0 auto;min-height:100vh;background:var(--bg);padding-bottom:82px}
+.top{padding:18px 18px 8px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}
+.brand{font-size:22px;font-weight:850}.gear{width:36px;height:36px;border-radius:50%;background:#eef0f2;border:0;display:grid;place-items:center;font-size:16px;cursor:pointer}
+.page{padding:16px 18px}.eyebrow{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.08em}.title{font-size:28px;font-weight:850;margin:6px 0 18px}
+.hero{background:#17181a;color:#fff;border-radius:20px;padding:24px;margin-bottom:16px}.hero .label{color:#b9bbc0;font-size:13px}.hero .amount{font-size:42px;font-weight:900;margin:6px 0 2px}.hero .status{font-size:13px;color:#c9cbd0;margin-top:6px}
+.bigbtn{width:100%;border:0;border-radius:16px;padding:20px;background:#fff;border:2px solid var(--line);font-weight:850;font-size:17px;cursor:pointer;display:grid;place-items:center;text-align:center;color:var(--ink);transition:all .2s}
+.bigbtn:active{transform:scale(.98);border-color:var(--ink)}.bigbtn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.card{background:var(--card);border-radius:16px;padding:16px;border:1px solid var(--line)}
+.label{font-size:12px;color:var(--muted);font-weight:700}.num{font-size:24px;font-weight:900;margin-top:6px}
+.section{margin-top:20px}.sectionhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.sectionhead h2{font-size:16px;font-weight:850;margin:0}
+.link{border:0;background:none;font-weight:750;cursor:pointer;color:var(--ink);padding:0;font-size:14px}
+.btn{width:100%;border:0;border-radius:13px;padding:12px 16px;background:var(--ink);color:#fff;font-weight:800;font-size:15px;cursor:pointer}.btn.secondary{background:#eef0f2;color:var(--ink)}.btn.danger{background:#fdeceb;color:var(--danger)}.btn:disabled{opacity:.5;cursor:default}
+.btnrow{display:flex;gap:9px}.btnrow .btn{flex:1}
+input,select{width:100%;border:1px solid #d9dadd;background:#fff;border-radius:11px;padding:11px;font-size:15px;outline:none;font-family:inherit;color:var(--ink)}input:focus,select:focus{border-color:var(--ink)}
+.form{display:grid;gap:12px}.field label{display:block;font-size:12px;color:var(--muted);font-weight:700;margin-bottom:5px}
+.progress{height:8px;background:#e7e8eb;border-radius:99px;overflow:hidden;margin:8px 0}.progress>div{height:100%;background:var(--ink);border-radius:99px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.row:last-child{border:0}.small{font-size:12px;color:var(--muted)}.bold{font-weight:800}
+.bottom{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.96);backdrop-filter:blur(14px);border-top:1px solid var(--line);height:72px;display:flex;justify-content:center}
+.nav{max-width:430px;width:100%;display:flex}.nav button{flex:1;border:0;background:none;color:#8a8d93;font-size:10px;font-weight:700;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;cursor:pointer}.nav button.active{color:var(--ink)}.nav .ni{font-size:18px}
+.screen{display:none}.screen.active{display:block}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:90px;background:var(--ink);color:#fff;padding:10px 14px;border-radius:99px;font-size:13px;font-weight:700;display:none;z-index:30}
+.loading{display:flex;align-items:center;justify-content:center;min-height:100vh;color:var(--muted);font-weight:700}
+.onboarding{background:var(--bg);min-height:100vh;padding:40px 20px;display:flex;align-items:center;justify-content:center}
+.onboardcard{background:#fff;border-radius:20px;padding:28px 20px;max-width:380px;width:100%;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.onboardpct{font-size:12px;color:var(--muted);font-weight:700;margin-bottom:12px}
+.onboardtitle{font-size:26px;font-weight:850;margin-bottom:8px}
+.onboardsub{font-size:14px;color:var(--muted);margin-bottom:20px}
+.segmented{display:flex;background:#eef0f2;border-radius:11px;padding:3px;gap:3px}
+.segmented button{flex:1;border:0;background:none;padding:8px 6px;border-radius:8px;font-weight:750;font-size:13px;color:#74777d;cursor:pointer}
+.segmented button.active{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.accitem{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff;margin-bottom:8px}
+.accitem .head{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.accitem .head input:first-child{flex:1}
+.accitem .head input:last-of-type{width:100px;text-align:right}
+.accitem .head .del{flex:0 0 28px;border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0}
+.accitem .bal{font-size:11px;color:var(--muted)}
+.incitem{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff;margin-bottom:8px}
+.incitem .top{display:flex;gap:6px;align-items:center;margin-bottom:8px}
+.incitem .top input:first-child{flex:1}
+.incitem .top input:last-of-type{width:80px;text-align:right}
+.incitem .top .del{flex:0 0 28px;border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0}
+.incitem .cadence{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px}.incitem .cadence input{padding:6px}
+.billitem{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff;margin-bottom:8px}
+.billitem .top{display:flex;gap:6px;align-items:center;margin-bottom:8px}
+.billitem .top input:first-child{flex:1}
+.billitem .top input[type="number"]{width:80px;text-align:right}
+.billitem .top .del{flex:0 0 28px;border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0}
+.billitem .grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.billitem .grid2 .mini{display:flex;flex-direction:column;gap:3px}
+.billitem .grid2 .mini label{font-size:10px;color:var(--muted);font-weight:700}
+.billitem .grid2 .mini input{padding:6px;font-size:13px}
+.billitem .link-field{display:flex;gap:6px;align-items:center;margin-bottom:8px}
+.billitem .link-field input{flex:1;padding:8px;font-size:12px}
+.billitem .link-field button{flex:0 0 80px;border:0;border-radius:8px;background:#eef0f2;color:var(--ink);font-weight:700;font-size:11px;cursor:pointer;padding:8px}
+.catitem{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff;margin-bottom:8px}
+.catitem .head{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.catitem .head input:first-child{flex:1}
+.catitem .head input:last-of-type{width:100px;text-align:right}
+.catitem .head .del{flex:0 0 28px;border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0}
+.catitem .bar{display:flex;align-items:center;gap:6px;font-size:11px}.catitem .bar .pct{font-weight:750;color:var(--ink)}
+.txitem{border:1px solid var(--line);border-radius:12px;padding:11px;background:#fff;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.txitem .info{flex:1}.txitem .info .label{font-size:13px;font-weight:750}.txitem .info .meta{font-size:11px;color:var(--muted);margin-top:1px}
+.txitem .amt{font-weight:850;white-space:nowrap}.txitem .del{flex:0 0 28px;border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0}
+.acctile{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff;margin-bottom:8px}
+.acctile .label{font-size:12px;color:var(--muted);font-weight:700;margin-bottom:4px}
+.acctile .amount{font-size:24px;font-weight:900}
+.acctile .sub{font-size:11px;color:var(--muted);margin-top:3px}
+</style>
+</head>
+<body>
+<div class="phone">
+
+<div id="onboarding" class="onboarding">
+<div class="onboardcard">
+<div class="onboardpct" id="onboardPct">Loading...</div>
+<div class="onboardtitle" id="onboardTitle">Money Map</div>
+<div class="onboardsub" id="onboardSub">Opening...</div>
+<div id="onboardForm" class="form"></div>
+<div style="display:flex;gap:9px;margin-top:16px">
+<button id="backBtn" class="btn secondary" onclick="prevOnboard()" style="display:none">Back</button>
+<button class="btn" onclick="nextOnboard()" style="flex:1">Next</button>
+</div>
+</div>
+</div>
+
+<div id="app" style="display:none">
+<div class="top">
+<div class="brand">Money Map</div>
+</div>
+
+<div id="home" class="screen active page">
+<div class="hero">
+<div class="label">Total available</div>
+<div class="amount" id="heroAmount">$0</div>
+</div>
+
+<div class="grid2">
+<button class="bigbtn primary" onclick="switchType('income');go('addexp')">➕ Income</button>
+<button class="bigbtn" style="background:#fdeceb;border-color:#f6d4d1;color:var(--danger)" onclick="switchType('expense');go('addexp')">- Expense</button>
+</div>
+
+<div class="section">
+<div class="sectionhead"><h2>Your accounts</h2><button class="link" onclick="go('editacc')">Edit</button></div>
+<div id="homeAccounts"></div>
+</div>
+
+<div class="section">
+<div class="sectionhead"><h2>Recent spending</h2></div>
+<div id="homeTransactions"></div>
+</div>
+</div>
+
+<div id="addexp" class="screen page">
+<div class="title">Add</div>
+<div class="card">
+<div class="segmented" id="incexpToggle" style="width:100%;margin-bottom:16px">
+<button class="active" data-type="expense" onclick="switchType('expense')">Expense</button>
+<button data-type="income" onclick="switchType('income')">Income</button>
+</div>
+</div>
+
+<div id="expenseForm" class="card">
+<div class="form">
+<div class="field"><label>Amount</label><input id="addAmt" type="number" min="0" step="0.01" placeholder="0.00" autofocus></div>
+<div class="field"><label>Category</label><select id="addCat"></select></div>
+<div class="field"><label>From account</label><select id="addAcc"></select></div>
+<div class="field"><label>Date</label><input id="addDate" type="date"></div>
+<div class="field"><label>Note (optional)</label><input id="addNote" type="text" placeholder="Where, what for, etc"></div>
+</div>
+<div style="height:12px"></div>
+<button class="btn" onclick="saveTx()">Add expense</button>
+<button class="btn secondary" onclick="go('home')" style="margin-top:8px">Cancel</button>
+</div>
+
+<div id="incomeForm" class="card" style="display:none">
+<div class="form">
+<div class="field"><label>Income name</label><input id="addIncLabel" type="text" placeholder="e.g. Paycheck" autofocus></div>
+<div class="field"><label>Amount</label><input id="addIncAmt" type="number" min="0" step="0.01" placeholder="0.00"></div>
+<div class="field"><label>Frequency</label><select id="addIncCadence"><option value="weekly">Weekly</option><option value="biweekly">Biweekly</option><option value="monthly" selected>Monthly</option><option value="onetime">One-time</option></select></div>
+<div class="field"><label>Date</label><input id="addIncDate" type="date"></div>
+</div>
+<div style="height:12px"></div>
+<button class="btn" onclick="saveIncome()">Add income</button>
+<button class="btn secondary" onclick="go('home')" style="margin-top:8px">Cancel</button>
+</div>
+</div>
+
+<div id="txresult" class="screen page">
+<div class="hero">
+<div class="label" id="txresLabel">Withdrawn from</div>
+<div class="amount" id="txresAmt">$0</div>
+<div class="status" id="txresStatus">Balance updated</div>
+</div>
+<div class="section">
+<div class="sectionhead"><h2" id="txresAccLabel">Account</h2></div>
+<div class="card">
+<div class="row"><span>New balance</span><b id="txresNewBal">$0</b></div>
+<div class="row"><span>Category remaining</span><b id="txresRemaining">$0</b></div>
+</div>
+</div>
+<button class="btn" onclick="go('home')" style="margin:16px 18px 0">Done</button>
+</div>
+
+<div id="budget" class="screen page">
+<div class="title">Budget</div>
+
+<div class="section">
+<div class="sectionhead"><h2>Income</h2></div>
+<div class="card">
+<div id="budgetIncome"></div>
+</div>
+</div>
+
+<div class="section">
+<div class="sectionhead"><h2>Recurring bills</h2><button class="link" onclick="go('editbills')">Manage</button></div>
+<div class="card">
+<div id="budgetBills"></div>
+</div>
+</div>
+
+<div class="section">
+<div class="sectionhead"><h2>Flexible spending</h2><button class="link" onclick="go('editcats')">Manage</button></div>
+<div id="budgetCats"></div>
+</div>
+
+<div class="section">
+<div class="sectionhead"><h2>Daily balance</h2></div>
+<div id="budgetDaily"></div>
+</div>
+</div>
+
+<div id="editacc" class="screen page">
+<button class="link" style="margin-bottom:12px" onclick="go('settings')">← Back</button>
+<div class="title">Your accounts</div>
+<div id="accountList"></div>
+<button class="btn secondary" onclick="addAccount()">+ Add account</button>
+</div>
+
+
+
+<div id="editbills" class="screen page">
+<button class="link" style="margin-bottom:12px" onclick="go('budget')">← Back</button>
+<div class="title">Recurring bills</div>
+<div id="billsList"></div>
+<button class="btn secondary" onclick="addBill()">+ Add bill</button>
+</div>
+
+<div id="editcats" class="screen page">
+<button class="link" style="margin-bottom:12px" onclick="go('budget')">← Back</button>
+<div class="title">Flexible spending</div>
+<div class="small" style="margin-bottom:12px">Set your budget for each category. We'll track spending as you log expenses.</div>
+<div id="catList"></div>
+<button class="btn secondary" onclick="addCat()">+ Add category</button>
+</div>
+
+<div id="settings" class="screen page">
+<button class="link" style="margin-bottom:12px" onclick="go('home')">← Back</button>
+<div class="title">Settings</div>
+
+<div style="height:12px"></div>
+<button class="btn danger" onclick="resetAll()">Start over</button>
+</div>
+
+</div>
+
+<div class="bottom"><div class="nav">
+<button class="active" data-go="home"><span class="ni">⌂</span>Home</button>
+<button data-go="addexp"><span class="ni">➕</span>Add</button>
+<button data-go="budget"><span class="ni">📊</span>Budget</button>
+<button data-go="settings"><span class="ni">⚙</span>Settings</button>
+</div></div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2}).format(Number(n)||0);
+const num=x=>{const v=Number(x);return isFinite(v)?v:0};
+const uid=()=>'id'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const todayStr=()=>new Date().toISOString().slice(0,10);
+
+let state={accounts:[{id:uid(),label:'Checking',balance:0}],income:[],bills:[],categories:[],transactions:[],period:'monthly',onboarded:true};
+let onboardStep=0;
+
+async function safeGet(k){try{return JSON.parse(localStorage.getItem(k)||'null')}catch(e){return null}}
+async function safeSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}
+function save(){safeSet('mm_v4',state)}
+function toast(m){$('toast').textContent=m;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',1400)}
+
+function render(){renderHome();renderAdd();renderBudget();renderSettings();renderAccounts();renderIncome();renderBills();renderCats()}
+function toggleIncomeEdit(){
+ const form=$('incomeEditForm');
+ const show=form.style.display==='none';
+ form.style.display=show?'block':'none';
+ if(show) renderIncome();
+}
+function renderHome(){
+ const totalBalance=state.accounts.reduce((s,a)=>s+num(a.balance)-spentFromAccount(a.id),0);
+ $('heroAmount').textContent=money(totalBalance);
+ 
+ $('homeAccounts').innerHTML=state.accounts.map((a,i)=>{
+  const bal=num(a.balance)-spentFromAccount(a.id);
+  const budgeted=monthlyEquiv(state.bills.filter(b=>b.accountId===a.id));
+  const warning=bal<budgeted?`<div class="card" style="padding:10px;background:#fdeceb;border:1px solid #f6d4d1;border-radius:12px;margin-top:8px;font-size:12px;color:var(--danger)"><b>⚠ Overspending</b><br>Bills scheduled: ${money(budgeted)}/mo but only ${money(bal)} available. Add funds or adjust bills.</div>`:'';
+  return `<div class="acctile"><div class="label">${a.label}</div><div class="amount" onclick="editAccBalance(${i})" style="cursor:pointer">${money(bal)}</div><div class="sub">Available balance</div>${warning}</div>`;
+ }).join('');
+ 
+ const recentTx=[...state.transactions].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
+ $('homeTransactions').innerHTML=recentTx.map((t,ti)=>{const cat=state.categories.find(c=>c.id===t.catId);const txIdx=state.transactions.indexOf(t);return `<div class="txitem"><div class="info"><div class="label">${t.note||cat?.label||'Expense'}</div><div class="meta">${cat?.label||''}${cat?'·':''}${t.date}</div></div><div style="display:flex;gap:8px;align-items:center"><div class="amt">-${money(t.amount)}</div><button class="txdel" onclick="state.transactions.splice(${txIdx},1);render();save()">×</button></div></div>`}).join('')||`<div class="card">No transactions yet.</div>`;
+}
+function switchType(t){
+ document.querySelectorAll('#incexpToggle button').forEach(b=>b.classList.toggle('active',b.dataset.type===t));
+ $('expenseForm').style.display=t==='expense'?'block':'none';
+ $('incomeForm').style.display=t==='income'?'block':'none';
+}
+function renderAdd(){
+ $('addCat').innerHTML=state.categories.map(c=>`<option value="${c.id}">${c.label}</option>`).join('');
+ $('addAcc').innerHTML=state.accounts.map(a=>`<option value="${a.id}">${a.label}</option>`).join('');
+ if(!$('addDate').value)$('addDate').value=todayStr();
+ if(!$('addIncDate').value)$('addIncDate').value=todayStr();
+}
+function saveIncome(){
+ const label=$('addIncLabel').value;
+ const amt=num($('addIncAmt').value);
+ if(!label){toast('Enter an income name');return}
+ if(amt<=0){toast('Enter an amount');return}
+ state.income.push({id:uid(),label,amount:amt,cadence:$('addIncCadence').value,date:$('addIncDate').value||todayStr()});
+ save();
+ $('addIncLabel').value='';$('addIncAmt').value='';$('addIncCadence').value='monthly';
+ go('home');render();
+}
+function renderBudget(){
+ renderBudgetIncome();
+ renderBudgetBills();
+ renderBudgetCats();
+ renderDaily();
+}
+function getNextOccurrences(item, startDate, endDate, cadence) {
+ const dates = [];
+ const start = new Date(startDate + 'T00:00:00');
+ const end = new Date(endDate + 'T00:00:00');
+ const itemDate = new Date((item.date || todayStr()) + 'T00:00:00');
+ 
+ if (cadence === 'onetime') {
+  if (itemDate >= start && itemDate <= end) dates.push(item.date || todayStr());
+ } else if (cadence === 'weekly') {
+  let cur = new Date(itemDate);
+  while (cur <= end) {
+   if (cur >= start) dates.push(cur.toISOString().slice(0, 10));
+   cur.setDate(cur.getDate() + 7);
+  }
+ } else if (cadence === 'biweekly') {
+  let cur = new Date(itemDate);
+  while (cur <= end) {
+   if (cur >= start) dates.push(cur.toISOString().slice(0, 10));
+   cur.setDate(cur.getDate() + 14);
+  }
+ } else if (cadence === 'monthly') {
+  const dayOfMonth = itemDate.getDate();
+  let cur = new Date(start.getFullYear(), start.getMonth(), dayOfMonth);
+  while (cur <= end) {
+   if (cur >= start) dates.push(cur.toISOString().slice(0, 10));
+   cur.setMonth(cur.getMonth() + 1);
+  }
+ }
+ return dates;
+}
+
+function renderDaily(){
+ const today = todayStr();
+ const now = new Date(today + 'T00:00:00');
+ const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+ const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+ const monthStartStr = monthStart.toISOString().slice(0, 10);
+ const monthEndStr = monthEnd.toISOString().slice(0, 10);
+ 
+ const startBal = state.accounts.reduce((s, a) => s + num(a.balance) - spentFromAccount(a.id), 0);
+ 
+ const dayEvents = {};
+ 
+ state.income.forEach(inc => {
+  const dates = getNextOccurrences(inc, monthStartStr, monthEndStr, inc.cadence || 'monthly');
+  dates.forEach(d => {
+   if (!dayEvents[d]) dayEvents[d] = [];
+   dayEvents[d].push({ type: 'income', label: inc.label, amt: num(inc.amount) });
+  });
+ });
+ 
+ state.bills.forEach(bill => {
+  const dates = getNextOccurrences(bill, monthStartStr, monthEndStr, bill.cadence || 'monthly');
+  dates.forEach(d => {
+   if (!dayEvents[d]) dayEvents[d] = [];
+   dayEvents[d].push({ type: 'expense', label: bill.label, amt: num(bill.amount) });
+  });
+ });
+ 
+ const sortedDays = Object.keys(dayEvents).sort();
+ let runningBal = startBal;
+ 
+ $('budgetDaily').innerHTML = sortedDays.map(day => {
+  const events = dayEvents[day];
+  let dayChg = 0;
+  const lines = events.map(e => {
+   dayChg += e.type === 'income' ? e.amt : -e.amt;
+   return `<div class="small" style="margin:3px 0"><span style="color:${e.type==='income'?'#198754':'#d64545'}">${e.type==='income'?'+':'-'}${money(e.amt)}</span> ${e.label}</div>`;
+  }).join('');
+  runningBal += dayChg;
+  const isNeg = runningBal < 0;
+  return `<div class="card" style="padding:12px;margin-bottom:8px;border-left:4px solid ${isNeg?'#d64545':'#17181a'}"><div style="font-weight:750;font-size:13px;margin-bottom:6px">${day}</div>${lines}<div style="margin-top:6px;font-weight:800;color:${isNeg?'#d64545':'#17181a'}">Balance: ${money(runningBal)}</div></div>`;
+ }).join('') || '<div class="small">No income or bills scheduled this month.</div>';
+}
+
+function renderSettings(){}
+function renderAccounts(){
+ $('accountList').innerHTML=state.accounts.map((a,i)=>`<div class="accitem"><div class="head"><input placeholder="Account name" value="${a.label}" onchange="state.accounts[${i}].label=this.value;render();save()"><input type="number" step="0.01" placeholder="0.00" value="${a.balance}" onchange="state.accounts[${i}].balance=num(this.value);render();save()"><button class="del" onclick="state.accounts.splice(${i},1);render();save()">×</button></div><div class="bal">Balance: ${money(num(a.balance)-spentFromAccount(a.id))}</div></div>`).join('');
+}
+function renderIncome(){
+ $('incomeList').innerHTML=state.income.map((x,i)=>`<div class="incitem"><div class="top"><input placeholder="e.g. Paycheck" value="${x.label}" onchange="state.income[${i}].label=this.value;render();save()"><input type="number" step="0.01" placeholder="0.00" value="${x.amount}" onchange="state.income[${i}].amount=num(this.value);render();save()"><button class="del" onclick="state.income.splice(${i},1);render();save()">×</button></div><div class="cadence"><select onchange="state.income[${i}].cadence=this.value;render();save()"><option value="weekly" ${x.cadence==='weekly'?'selected':''}>Weekly</option><option value="biweekly" ${x.cadence==='biweekly'?'selected':''}>Biweekly</option><option value="monthly" ${x.cadence==='monthly'?'selected':''}>Monthly</option><option value="onetime" ${x.cadence==='onetime'?'selected':''}>One-time</option></select><input type="date" value="${x.date||''}" onchange="state.income[${i}].date=this.value;render();save()" placeholder="Date"></div></div>`).join('');
+}
+function renderBudgetIncome(){
+ $('budgetIncome').innerHTML=state.income.map(x=>`<div class="row" style="padding:10px 0"><div><span class="small">${x.label}</span><br><span class="small" style="font-size:10px;color:var(--muted)">${x.cadence}${x.cadence!=='onetime'?'':''} • ${x.date}</span></div><b>${money(x.amount)}</b></div>`).join('')||`<div class="small">No income set up.</div>`;
+}
+function renderBills(){
+ $('billsList').innerHTML=state.bills.map((x,i)=>{const acc=state.accounts.find(a=>a.id===x.accountId);return `<div class="billitem"><div class="top"><input placeholder="e.g. Electricity" value="${x.label}" onchange="state.bills[${i}].label=this.value;render();save()"><input type="number" step="0.01" placeholder="0.00" value="${x.amount}" onchange="state.bills[${i}].amount=num(this.value);render();save()"><button class="del" onclick="state.bills.splice(${i},1);render();save()">×</button></div><div class="grid2"><div class="mini"><label>From account</label><select onchange="state.bills[${i}].accountId=this.value;render();save()">${state.accounts.map(a=>`<option value="${a.id}" ${a.id===x.accountId?'selected':''}>${a.label}</option>`).join('')}</select></div><div class="mini"><label>Frequency</label><select onchange="state.bills[${i}].cadence=this.value;render();save()"><option value="weekly" ${x.cadence==='weekly'?'selected':''}>Weekly</option><option value="biweekly" ${x.cadence==='biweekly'?'selected':''}>Biweekly</option><option value="monthly" ${x.cadence==='monthly'?'selected':''}>Monthly</option><option value="onetime" ${x.cadence==='onetime'?'selected':''}>One-time</option></select></div><div class="mini"><label>Due date</label><input type="date" value="${x.date||''}" onchange="state.bills[${i}].date=this.value;render();save()"></div></div><div class="link-field"><input type="url" placeholder="https://..." value="${x.link||''}" onchange="state.bills[${i}].link=this.value;save()"><button onclick="if(state.bills[${i}].link)window.open(state.bills[${i}].link)">Visit</button></div></div>`}).join('');
+}
+function renderBudgetBills(){
+ $('budgetBills').innerHTML=state.bills.filter(b=>!b.isDebt).map(x=>{const acc=state.accounts.find(a=>a.id===x.accountId);return `<div class="row" style="padding:10px 0"><div><span class="small">${x.label}</span><br><span class="small" style="font-size:10px;color:var(--muted)">${x.cadence} • ${x.date} • ${acc?.label}</span></div><b>-${money(x.amount)}</b></div>`}).join('')||`<div class="small">No bills set up.</div>`;
+}
+function renderCats(){
+ $('catList').innerHTML=state.categories.map((x,i)=>`<div class="catitem"><div class="head"><input placeholder="e.g. Food" value="${x.label}" onchange="state.categories[${i}].label=this.value;render();save()"><input type="number" step="0.01" placeholder="Budget" value="${x.budget}" onchange="state.categories[${i}].budget=num(this.value);render();save()"><button class="del" onclick="state.categories.splice(${i},1);render();save()">×</button></div><div class="cadence" style="margin-top:8px"><select onchange="state.categories[${i}].cadence=this.value;render();save()" style="flex:1"><option value="weekly" ${x.cadence==='weekly'?'selected':''}>Weekly</option><option value="biweekly" ${x.cadence==='biweekly'?'selected':''}>Biweekly</option><option value="monthly" ${x.cadence==='monthly'?'selected':''}>Monthly</option></select></div></div>`).join('');
+}
+function renderBudgetCats(){
+ $('budgetCats').innerHTML=state.categories.map(c=>{const spent=spentThisPeriod(c.id);const left=num(c.budget)-spent;const pct=num(c.budget)>0?Math.min(100,spent/num(c.budget)*100):0;return `<div class="card" style="padding:12px;margin-bottom:8px"><div class="row" style="padding:0;border:0;margin-bottom:6px"><span><b>${c.label}</b><br><span class="small" style="font-size:10px;color:var(--muted)">${c.cadence}</span></span><span class="bold">${money(spent)}/${money(c.budget)}</span></div><div class="progress"><div style="width:${pct}%;background:${left<0?'#d64545':'#17181a'}"></div></div></div>`}).join('')||`<div class="card">No flexible categories yet.</div>`;
+}
+
+function addAccount(){state.accounts.push({id:uid(),label:'',balance:0});renderAccounts()}
+function addIncome(){state.income.push({id:uid(),label:'',amount:0,cadence:'monthly',date:todayStr()});renderIncome()}
+function addBill(){state.bills.push({id:uid(),label:'',amount:0,accountId:state.accounts[0]?.id||'',date:todayStr(),link:'',isDebt:false,cadence:'monthly'});renderBills()}
+function addCat(){state.categories.push({id:uid(),label:'',budget:0,cadence:'monthly'});renderCats()}
+
+function saveTx(){
+ const amt=num($('addAmt').value);if(amt<=0){toast('Enter an amount');return}
+ const catId=$('addCat').value;if(!catId){toast('Pick a category');return}
+ const accId=$('addAcc').value;
+ const acc=state.accounts.find(a=>a.id===accId);
+ const cat=state.categories.find(c=>c.id===catId);
+ state.transactions.push({id:uid(),amount:amt,catId,accountId:accId,date:$('addDate').value||todayStr(),note:$('addNote').value});
+ save();
+ const newBal=num(acc.balance)-spentFromAccount(accId);
+ const spent=spentThisPeriod(catId);
+ const remaining=num(cat.budget)-spent;
+ $('txresAccLabel').textContent=acc.label;
+ $('txresAmt').textContent='-'+money(amt);
+ $('txresStatus').textContent='Expense logged';
+ $('txresNewBal').textContent=money(newBal);
+ $('txresRemaining').textContent=money(Math.max(0,remaining))+' left';
+ go('txresult');
+ render();
+}
+
+function spentFromAccount(accId){
+ return state.transactions.filter(t=>t.accountId===accId).reduce((s,t)=>s+num(t.amount),0);
+}
+function spentThisPeriod(catId){
+ return state.transactions.filter(t=>t.catId===catId).reduce((s,t)=>s+num(t.amount),0);
+}
+function monthlyEquiv(items){
+ return items.reduce((s,x)=>{const m=num(x.amount);if(x.cadence==='weekly')return s+m*52/12;if(x.cadence==='biweekly')return s+m*26/12;return s+m},0);
+}
+
+function go(id){
+ document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');
+ document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.go===id));
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('.nav button').forEach(x=>x.onclick=()=>go(x.dataset.go));
+document.querySelectorAll('#budget [data-period]').forEach(b=>b.onclick=()=>{state.period=b.dataset.period;render();save()});
+
+function editAccBalance(i){
+ const a=state.accounts[i];
+ const newBal=prompt(`Edit balance for ${a.label}:`,a.balance);
+ if(newBal!==null){a.balance=num(newBal);save();render();}
+}
+
+async function resetAll(){if(confirm('Erase everything?')){localStorage.removeItem('mm_v4');location.reload()}}
+
+async function init(){
+ const saved=await safeGet('mm_v4');
+ if(saved){state=saved;}
+ render();
+ $('onboarding').style.display='none';
+ $('app').style.display='block';
+ go('home');
+}
+init();
+
+if('serviceWorker' in navigator && window.top===window.self && /^https?:$/.test(location.protocol)){
+ window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW registration skipped'))});
+}
+</script>
+</body>
+</html>
