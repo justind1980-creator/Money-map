@@ -109,11 +109,6 @@ input,select{width:100%;border:1px solid #d9dadd;background:#fff;border-radius:1
 <div id="homeAccounts"></div>
 </div>
 
-<div class="section">
-<div class="sectionhead"><h2>Recent spending</h2></div>
-<div id="homeTransactions"></div>
-</div>
-
 <div style="height:12px"></div>
 <button class="btn danger" onclick="resetAll()">Reset all</button>
 </div>
@@ -209,8 +204,8 @@ input,select{width:100%;border:1px solid #d9dadd;background:#fff;border-radius:1
 </div>
 
 <div class="section">
-<div class="sectionhead"><h2>Daily balance</h2></div>
-<div id="budgetDaily"></div>
+<div class="sectionhead"><h2>Recent spending</h2></div>
+<div id="homeTransactions"></div>
 </div>
 </div>
 
@@ -255,7 +250,7 @@ const num=x=>{const v=Number(x);return isFinite(v)?v:0};
 const uid=()=>'id'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const todayStr=()=>new Date().toISOString().slice(0,10);
 
-let state={accounts:[{id:uid(),label:'Checking',balance:0}],income:[],bills:[],categories:[],transactions:[],period:'monthly',debtStrategy:'snowball',onboarded:true};
+let state={accounts:[{id:uid(),label:'Checking',balance:0}],income:[],bills:[],categories:[],transactions:[],period:'monthly',debtStrategy:'snowball',onboarded:true,debtTypes:{}};
 let debtExpanded={};
 
 async function safeGet(k){try{return JSON.parse(localStorage.getItem(k)||'null')}catch(e){return null}}
@@ -268,15 +263,48 @@ function renderHome(){
  const totalBalance=state.accounts.reduce((s,a)=>s+num(a.balance)-spentFromAccount(a.id),0);
  $('heroAmount').textContent=money(totalBalance);
  
- $('homeAccounts').innerHTML=state.accounts.map((a,i)=>{
-  const bal=num(a.balance)-spentFromAccount(a.id);
-  const budgeted=monthlyEquiv(state.bills.filter(b=>b.accountId===a.id));
-  const warning=bal<budgeted?`<div class="card" style="padding:10px;background:#fdeceb;border:1px solid #f6d4d1;border-radius:12px;margin-top:8px;font-size:12px;color:var(--danger)"><b>⚠ Overspending</b><br>Bills scheduled: ${money(budgeted)}/mo but only ${money(bal)} available. Add funds or adjust bills.</div>`:'';
-  return `<div class="acctile"><div class="label">${a.label}</div><div class="amount" onclick="editAccBalance(${i})">${money(bal)}</div><div class="sub">Available balance</div>${warning}</div>`;
- }).join('');
+ const today=todayStr();
+ const now=new Date(today+'T00:00:00');
+ const monthStart=new Date(now.getFullYear(),now.getMonth(),1);
+ const monthEnd=new Date(now.getFullYear(),now.getMonth()+1,0);
+ const monthStartStr=monthStart.toISOString().slice(0,10);
+ const monthEndStr=monthEnd.toISOString().slice(0,10);
  
- const recentTx=[...state.transactions].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
- $('homeTransactions').innerHTML=recentTx.map((t,ti)=>{const cat=state.categories.find(c=>c.id===t.catId);const txIdx=state.transactions.indexOf(t);return `<div class="txitem"><div class="info"><div class="label">${t.note||cat?.label||'Expense'}</div><div class="meta">${cat?.label||''}${cat?'·':''}${t.date}</div></div><div style="display:flex;gap:8px;align-items:center"><div class="amt">-${money(t.amount)}</div><button onclick="state.transactions.splice(${txIdx},1);render();save()" style="border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0">×</button></div></div>`}).join('')||`<div class="card">No transactions yet.</div>`;
+ $('homeAccounts').innerHTML=state.accounts.map((a,i)=>{
+  const currentBal=num(a.balance)-spentFromAccount(a.id);
+  const budgeted=monthlyEquiv(state.bills.filter(b=>b.accountId===a.id));
+  const warning=currentBal<budgeted?`<div class="card" style="padding:10px;background:#fdeceb;border:1px solid #f6d4d1;border-radius:12px;margin-top:8px;font-size:12px;color:var(--danger);cursor:pointer" onclick="go('budget')"><b>⚠ Overspending</b><br>Bills scheduled: ${money(budgeted)}/mo but only ${money(currentBal)} available. Add funds or adjust bills.</div>`:'';
+  
+  const dayEvents={};
+  state.income.forEach(inc=>{
+   if(inc.accountId===a.id){
+    const dates=getNextOccurrences(inc,monthStartStr,monthEndStr,inc.cadence||'monthly');
+    dates.forEach(d=>{if(!dayEvents[d])dayEvents[d]=[];dayEvents[d].push({type:'income',label:inc.label,amt:num(inc.amount)});});
+   }
+  });
+  state.bills.forEach(bill=>{
+   if(bill.accountId===a.id){
+    const dates=getNextOccurrences(bill,monthStartStr,monthEndStr,bill.cadence||'monthly');
+    dates.forEach(d=>{if(!dayEvents[d])dayEvents[d]=[];dayEvents[d].push({type:'expense',label:bill.label,amt:num(bill.amount)});});
+   }
+  });
+  
+  const sortedDays=Object.keys(dayEvents).sort().filter(d=>d>=today);
+  let runningBal=currentBal;
+  const entries=sortedDays.map(day=>{
+   const events=dayEvents[day];
+   let dayChg=0;
+   const lines=events.map(e=>{
+    dayChg+=e.type==='income'?e.amt:-e.amt;
+    return `<div class="small" style="margin:2px 0"><span style="color:${e.type==='income'?'#198754':'#d64545'};font-weight:750">${e.type==='income'?'+':'-'}${money(e.amt)}</span> ${e.label}</div>`;
+   }).join('');
+   runningBal+=dayChg;
+   const isNeg=runningBal<0;
+   return `<div style="margin-top:6px;border-top:1px solid var(--line);padding-top:6px">${lines}<div style="margin-top:3px;font-size:11px;font-style:italic;color:${isNeg?'#d64545':'var(--muted)'}${isNeg?';font-weight:700':''}">${money(runningBal)}</div></div>`;
+  }).join('');
+  
+  return `<div class="acctile"><div class="label">${a.label}</div><div class="amount" onclick="editAccBalance(${i})">${money(currentBal)}</div><div class="sub">Available balance</div>${entries}${warning}</div>`;
+ }).join('');
 }
 function switchType(t){
  document.querySelectorAll('#incexpToggle button').forEach(b=>b.classList.toggle('active',b.dataset.type===t));
@@ -305,7 +333,11 @@ function renderBudget(){
  renderBudgetIncome();
  renderBudgetBills();
  renderBudgetCats();
- renderDaily();
+ renderRecentTransactions();
+}
+function renderRecentTransactions(){
+ const recentTx=[...state.transactions].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
+ $('homeTransactions').innerHTML=recentTx.map((t,ti)=>{const cat=state.categories.find(c=>c.id===t.catId);const txIdx=state.transactions.indexOf(t);return `<div class="txitem"><div class="info"><div class="label">${t.note||cat?.label||'Expense'}</div><div class="meta">${cat?.label||''}${cat?'·':''}${t.date}</div></div><div style="display:flex;gap:8px;align-items:center"><div class="amt">-${money(t.amount)}</div><button onclick="state.transactions.splice(${txIdx},1);render();save()" style="border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0">×</button></div></div>`}).join('')||`<div class="card">No transactions yet.</div>`;
 }
 function getNextOccurrences(item, startDate, endDate, cadence) {
  const dates = [];
@@ -383,17 +415,17 @@ function renderDaily(){
 }
 
 function renderRecurring(){
- $('billsList').innerHTML=state.bills.map((x,i)=>{const acc=state.accounts.find(a=>a.id===x.accountId);const expanded=debtExpanded[x.id];return `<div class="billitem"><div class="top"><input placeholder="e.g. Electricity" value="${x.label}" onchange="state.bills[${i}].label=this.value;render();save()"><input type="number" step="0.01" placeholder="0.00" value="${x.amount}" onchange="state.bills[${i}].amount=num(this.value);render();save()"><button class="debtbtn ${x.isDebt?'active':''}" onclick="toggleDebt(${i})">DEBT</button><button onclick="state.bills.splice(${i},1);render();save()" style="border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0">×</button></div><div class="grid2"><div class="mini"><label>From account</label><select onchange="state.bills[${i}].accountId=this.value;render();save()">${state.accounts.map(a=>`<option value="${a.id}" ${a.id===x.accountId?'selected':''}>${a.label}</option>`).join('')}</select></div><div class="mini"><label>Frequency</label><select onchange="state.bills[${i}].cadence=this.value;render();save()"><option value="weekly" ${x.cadence==='weekly'?'selected':''}>Weekly</option><option value="biweekly" ${x.cadence==='biweekly'?'selected':''}>Biweekly</option><option value="monthly" ${x.cadence==='monthly'?'selected':''}>Monthly</option><option value="onetime" ${x.cadence==='onetime'?'selected':''}>One-time</option></select></div><div class="mini"><label>Due date</label><input type="date" value="${x.date||''}" onchange="state.bills[${i}].date=this.value;render();save()"></div></div><div class="link-field"><input type="url" placeholder="https://..." value="${x.link||''}" onchange="state.bills[${i}].link=this.value;save()"><button onclick="if(state.bills[${i}].link)window.open(state.bills[${i}].link)">Visit</button></div>${expanded?`<div class="debtrow"><div class="mini"><label>APR %</label><input type="number" step="0.01" value="${x.apr||''}" onchange="state.bills[${i}].apr=num(this.value);save()" placeholder="5.5"></div><div class="mini"><label>Term (months)</label><input type="number" value="${x.term||''}" onchange="state.bills[${i}].term=num(this.value);save()" placeholder="60"></div><div class="mini"><label>End Date</label><input type="date" value="${x.endDate||''}" onchange="state.bills[${i}].endDate=this.value;save()"></div><div class="mini"><label>Payoff Amount</label><input type="number" step="0.01" value="${x.payoff||''}" onchange="state.bills[${i}].payoff=num(this.value);save()" placeholder="0.00"></div><div class="mini"><label>Payoff Date</label><input type="date" value="${x.payoffDate||''}" onchange="state.bills[${i}].payoffDate=this.value;save()"></div></div>`:''}\n</div>`}).join('');
+ $('billsList').innerHTML=state.bills.map((x,i)=>{
+  const acc=state.accounts.find(a=>a.id===x.accountId);
+  const debtType=state.debtTypes[x.id]||'none';
+  const isCC=debtType==='creditcard';
+  const isLoan=debtType==='loan';
+  return `<div class="billitem"><div class="top"><input placeholder="e.g. Electricity" value="${x.label}" onchange="state.bills[${i}].label=this.value;render();save()"><input type="number" step="0.01" placeholder="0.00" value="${x.amount}" onchange="state.bills[${i}].amount=num(this.value);render();save()"><select onchange="setDebtType(${i},this.value);render();save()" style="width:auto;flex:0 0 120px"><option value="none" ${debtType==='none'?'selected':''}>Debt Type</option><option value="creditcard" ${isCC?'selected':''}>Credit Card</option><option value="loan" ${isLoan?'selected':''}>Loan</option></select><button onclick="state.bills.splice(${i},1);render();save()" style="border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0">×</button></div><div class="grid2"><div class="mini"><label>From account</label><select onchange="state.bills[${i}].accountId=this.value;render();save()">${state.accounts.map(a=>`<option value="${a.id}" ${a.id===x.accountId?'selected':''}>${a.label}</option>`).join('')}</select></div><div class="mini"><label>Frequency</label><select onchange="state.bills[${i}].cadence=this.value;render();save()"><option value="weekly" ${x.cadence==='weekly'?'selected':''}>Weekly</option><option value="biweekly" ${x.cadence==='biweekly'?'selected':''}>Biweekly</option><option value="monthly" ${x.cadence==='monthly'?'selected':''}>Monthly</option><option value="onetime" ${x.cadence==='onetime'?'selected':''}>One-time</option></select></div><div class="mini"><label>Due date</label><input type="date" value="${x.date||''}" onchange="state.bills[${i}].date=this.value;render();save()"></div></div><div class="link-field"><input type="url" placeholder="https://..." value="${x.link||''}" onchange="state.bills[${i}].link=this.value;save()"><button onclick="if(state.bills[${i}].link)window.open(state.bills[${i}].link)">Visit</button></div>${isCC?`<div class="debtrow"><div class="mini"><label>APR %</label><input type="number" step="0.01" value="${x.apr||''}" onchange="state.bills[${i}].apr=num(this.value);render();save()" placeholder="5.5"></div><div class="mini"><label>Balance</label><input type="number" step="0.01" value="${x.amount}" onchange="state.bills[${i}].amount=num(this.value);render();save()" placeholder="0.00"></div>${num(x.apr||0)===0?`<div class="mini"><label>Until when?</label><input type="date" value="${x.endDate||''}" onchange="state.bills[${i}].endDate=this.value;save()"></div>`:''}</div>`:isLoan?`<div class="debtrow"><div class="mini"><label>APR %</label><input type="number" step="0.01" value="${x.apr||''}" onchange="state.bills[${i}].apr=num(this.value);save()" placeholder="5.5"></div><div class="mini"><label>Payoff $</label><input type="number" step="0.01" value="${x.payoff||''}" onchange="state.bills[${i}].payoff=num(this.value);save()" placeholder="0.00"></div><div class="mini"><label>Months Remaining</label><input type="number" value="${x.term||''}" onchange="state.bills[${i}].term=num(this.value);save()" placeholder="60"></div></div>`:''}</div>`
+ }).join('');
 }
 
-function toggleDebt(i){
- state.bills[i].isDebt=!state.bills[i].isDebt;
- if(state.bills[i].isDebt){
-  debtExpanded[state.bills[i].id]=true;
- }else{
-  delete debtExpanded[state.bills[i].id];
- }
- save();render();
+function setDebtType(i,type){
+ state.debtTypes[state.bills[i].id]=type;
 }
 
 function renderFlexible(){
@@ -404,14 +436,15 @@ function renderBudgetIncome(){
  $('budgetIncome').innerHTML=state.income.map(x=>{const acc=state.accounts.find(a=>a.id===x.accountId);return `<div class="row" style="padding:10px 0"><div><span class="small">${x.label}</span><br><span class="small" style="font-size:10px;color:var(--muted)">${x.cadence} • ${x.date} • ${acc?.label||'Account'}</span></div><b>${money(x.amount)}</b></div>`}).join('')||`<div class="small">No income set up.</div>`;
 }
 function renderBudgetBills(){
- $('budgetBills').innerHTML=state.bills.filter(b=>!b.isDebt).map(x=>{const acc=state.accounts.find(a=>a.id===x.accountId);return `<div class="row" style="padding:10px 0"><div><span class="small">${x.label}</span><br><span class="small" style="font-size:10px;color:var(--muted)">${x.cadence} • ${x.date} • ${acc?.label}</span></div><b>-${money(x.amount)}</b></div>`}).join('')||`<div class="small">No bills set up.</div>`;
+ const dt=state.debtTypes||{};
+ $('budgetBills').innerHTML=state.bills.filter(b=>{const t=dt[b.id];return t!=='creditcard'&&t!=='loan'}).map(x=>{const acc=state.accounts.find(a=>a.id===x.accountId);return `<div class="row" style="padding:10px 0"><div><span class="small">${x.label}</span><br><span class="small" style="font-size:10px;color:var(--muted)">${x.cadence} • ${x.date} • ${acc?.label}</span></div><b>-${money(x.amount)}</b></div>`}).join('')||`<div class="small">No bills set up.</div>`;
 }
 function renderBudgetCats(){
  $('budgetCats').innerHTML=state.categories.map(c=>{const spent=spentThisPeriod(c.id);const left=num(c.budget)-spent;const pct=num(c.budget)>0?Math.min(100,spent/num(c.budget)*100):0;return `<div class="card" style="padding:12px;margin-bottom:8px"><div class="row" style="padding:0;border:0;margin-bottom:6px"><span><b>${c.label}</b><br><span class="small" style="font-size:10px;color:var(--muted)">${c.cadence}</span></span><span class="bold">${money(spent)}/${money(c.budget)}</span></div><div class="progress"><div style="width:${pct}%;background:${left<0?'#d64545':'#17181a'}"></div></div></div>`}).join('')||`<div class="card">No flexible categories yet.</div>`;
 }
 
 function renderDebts(){
- const debts=state.bills.filter(b=>b.isDebt&&num(b.amount)>0);
+ const debts=state.bills.filter(b=>{const dt=state.debtTypes[b.id];return dt==='creditcard'||dt==='loan'});
  const sorted=debts.slice().sort((a,b)=>{
   if(state.debtStrategy==='snowball'){
    return num(a.amount)-num(b.amount);
@@ -419,7 +452,12 @@ function renderDebts(){
    return num(b.apr||0)-num(a.apr||0);
   }
  });
- $('debtsList').innerHTML=sorted.map(d=>{const acc=state.accounts.find(a=>a.id===d.accountId);return `<div class="debtcard"><div class="name">${d.label}</div><div class="stats"><div>Balance: ${money(d.amount)}</div><div>APR: ${d.apr||'N/A'}%</div><div>Term: ${d.term||'N/A'} months</div><div>End Date: ${d.endDate||'N/A'}</div><div>Payoff: ${money(d.payoff||0)} on ${d.payoffDate||'N/A'}</div><div style="margin-top:4px;font-size:10px;color:var(--ink)">From: ${acc?.label}</div></div></div>`}).join('')||`<div class="card">No debts tracked yet. Mark bills as DEBT in Recurring to add them.</div>`;
+ if(sorted.length===0){
+  $('debtsList').innerHTML=`<div class="card">No debts tracked yet. Add debts in Recurring tab.</div>`;
+  return;
+ }
+ const html=`<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="border-bottom:2px solid var(--line)"><th style="text-align:left;padding:12px;font-weight:850">Debt Name</th><th style="text-align:right;padding:12px;font-weight:850;color:#d64545">Balance</th><th style="text-align:right;padding:12px;font-weight:850">APR</th></tr></thead><tbody>${sorted.map(d=>`<tr style="border-bottom:1px solid var(--line)"><td style="padding:12px">${d.label}</td><td style="padding:12px;text-align:right;color:#d64545;font-weight:750">${money(d.amount)}</td><td style="padding:12px;text-align:right">${d.apr||'—'}%</td></tr>`).join('')}</tbody></table></div>`;
+ $('debtsList').innerHTML=html;
 }
 
 function switchDebtStrategy(s){
@@ -430,7 +468,7 @@ function switchDebtStrategy(s){
 }
 
 function addAccount(){state.accounts.push({id:uid(),label:'',balance:0});renderAccounts()}
-function addBill(){state.bills.push({id:uid(),label:'',amount:0,accountId:state.accounts[0]?.id||'',date:todayStr(),link:'',isDebt:false,cadence:'monthly'});renderRecurring()}
+function addBill(){state.bills.push({id:uid(),label:'',amount:0,accountId:state.accounts[0]?.id||'',date:todayStr(),link:'',cadence:'monthly'});renderRecurring()}
 function addCat(){state.categories.push({id:uid(),label:'',budget:0,cadence:'monthly',accountId:state.accounts[0]?.id||''});renderFlexible()}
 
 function saveTx(){
