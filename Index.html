@@ -464,10 +464,10 @@ async function resetAll(){if(confirm('Erase everything?')){localStorage.removeIt
 async function init(){
  const saved=await safeGet('mm_v4');
  if(saved){state=saved;}
- render();
+ try{render();}catch(e){console.log(e)}
  $('onboarding').style.display='none';
  $('app').style.display='block';
- go('home');
+ setTimeout(()=>go('home'),100);
 }
 init();
 
