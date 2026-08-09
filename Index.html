@@ -166,14 +166,12 @@ input,select{width:100%;border:1px solid #d9dadd;background:#fff;border-radius:1
 </div>
 
 <div id="recurring" class="screen page">
-<button class="link" style="margin-bottom:12px" onclick="go('home')">← Back</button>
 <div class="title">Recurring bills</div>
 <div id="billsList"></div>
 <button class="btn secondary" onclick="addBill()">+ Add bill</button>
 </div>
 
 <div id="flexible" class="screen page">
-<button class="link" style="margin-bottom:12px" onclick="go('home')">← Back</button>
 <div class="title">Flexible spending</div>
 <div class="small" style="margin-bottom:12px">Set your budget for each category. We'll track spending as you log expenses.</div>
 <div id="catList"></div>
@@ -181,7 +179,6 @@ input,select{width:100%;border:1px solid #d9dadd;background:#fff;border-radius:1
 </div>
 
 <div id="budget" class="screen page">
-<button class="link" style="margin-bottom:12px" onclick="go('home')">← Back</button>
 <div class="title">Budget</div>
 
 <div class="section">
@@ -210,7 +207,6 @@ input,select{width:100%;border:1px solid #d9dadd;background:#fff;border-radius:1
 </div>
 
 <div id="debts" class="screen page">
-<button class="link" style="margin-bottom:12px" onclick="go('home')">← Back</button>
 <div class="title">Debts</div>
 
 <div class="card" style="margin-bottom:16px">
@@ -224,7 +220,6 @@ input,select{width:100%;border:1px solid #d9dadd;background:#fff;border-radius:1
 </div>
 
 <div id="editacc" class="screen page">
-<button class="link" style="margin-bottom:12px" onclick="go('home')">← Back</button>
 <div class="title">Your accounts</div>
 <div id="accountList"></div>
 <button class="btn secondary" onclick="addAccount()">+ Add account</button>
@@ -277,27 +272,47 @@ function renderHome(){
   state.income.forEach(inc=>{
    if(inc.accountId===a.id){
     const dates=getNextOccurrences(inc,monthStartStr,monthEndStr,inc.cadence||'monthly');
-    dates.forEach(d=>{if(!dayEvents[d])dayEvents[d]=[];dayEvents[d].push({type:'income',label:inc.label,amt:num(inc.amount)});});
+    dates.forEach(d=>{if(!dayEvents[d])dayEvents[d]=[];dayEvents[d].push({type:'income',label:inc.label,amt:num(inc.amount),highlight:false});});
    }
   });
   state.bills.forEach(bill=>{
    if(bill.accountId===a.id){
     const dates=getNextOccurrences(bill,monthStartStr,monthEndStr,bill.cadence||'monthly');
-    dates.forEach(d=>{if(!dayEvents[d])dayEvents[d]=[];dayEvents[d].push({type:'expense',label:bill.label,amt:num(bill.amount)});});
+    dates.forEach(d=>{if(!dayEvents[d])dayEvents[d]=[];dayEvents[d].push({type:'expense',label:bill.label,amt:num(bill.amount),highlight:false});});
    }
   });
   state.categories.forEach(cat=>{
-   if(cat.transferFromAccountId===a.id){
-    const transferDate=cat.transferDate||cat.startDate||todayStr();
+   if(cat.transferFromAccountId===a.id&&cat.transferDate){
+    const transferDate=cat.transferDate;
     if(transferDate>=monthStartStr&&transferDate<=monthEndStr){
      if(!dayEvents[transferDate])dayEvents[transferDate]=[];
-     dayEvents[transferDate].push({type:'transfer',label:`Transfer to ${state.accounts.find(ac=>ac.id===cat.accountId)?.label||'Account'} (${cat.label})`,amt:num(cat.budget)});
+     dayEvents[transferDate].push({type:'transfer',label:`Transfer to ${state.accounts.find(ac=>ac.id===cat.accountId)?.label||'Account'} (${cat.label})`,amt:num(cat.budget),highlight:true,isInitial:true});
+    }
+    const futureStartDate=new Date(transferDate+'T00:00:00');
+    futureStartDate.setDate(futureStartDate.getDate()+(cat.cadence==='weekly'?7:cat.cadence==='biweekly'?14:30));
+    const futureStartStr=futureStartDate.toISOString().slice(0,10);
+    if(futureStartStr<=monthEndStr){
+     const futureDates=getNextOccurrences({date:futureStartStr,cadence:cat.cadence},futureStartStr,monthEndStr,cat.cadence||'monthly');
+     futureDates.forEach(d=>{if(!dayEvents[d])dayEvents[d]=[];dayEvents[d].push({type:'income',label:`Transfer to ${state.accounts.find(ac=>ac.id===cat.accountId)?.label||'Account'} (${cat.label})`,amt:num(cat.budget),highlight:false});});
     }
    }else if(!cat.transferFromAccountId&&cat.accountId===a.id){
     const startDate=cat.startDate||todayStr();
     if(startDate>=monthStartStr&&startDate<=monthEndStr){
      if(!dayEvents[startDate])dayEvents[startDate]=[];
-     dayEvents[startDate].push({type:'budgeted',label:cat.label,amt:num(cat.budget),catId:cat.id});
+     dayEvents[startDate].push({type:'budgeted',label:cat.label,amt:num(cat.budget),catId:cat.id,highlight:false});
+    }
+   }else if(cat.transferFromAccountId&&cat.accountId===a.id&&cat.transferDate){
+    const transferDate=cat.transferDate;
+    if(transferDate>=monthStartStr&&transferDate<=monthEndStr){
+     if(!dayEvents[transferDate])dayEvents[transferDate]=[];
+     dayEvents[transferDate].push({type:'transfer-in',label:`Transfer from ${state.accounts.find(ac=>ac.id===cat.transferFromAccountId)?.label||'Account'} (${cat.label})`,amt:num(cat.budget),highlight:true,isInitial:true});
+    }
+    const futureStartDate=new Date(transferDate+'T00:00:00');
+    futureStartDate.setDate(futureStartDate.getDate()+(cat.cadence==='weekly'?7:cat.cadence==='biweekly'?14:30));
+    const futureStartStr=futureStartDate.toISOString().slice(0,10);
+    if(futureStartStr<=monthEndStr){
+     const futureDates=getNextOccurrences({date:futureStartStr,cadence:cat.cadence},futureStartStr,monthEndStr,cat.cadence||'monthly');
+     futureDates.forEach(d=>{if(!dayEvents[d])dayEvents[d]=[];dayEvents[d].push({type:'income',label:`Transfer from ${state.accounts.find(ac=>ac.id===cat.transferFromAccountId)?.label||'Account'} (${cat.label})`,amt:num(cat.budget),highlight:false});});
     }
    }
   });
@@ -308,12 +323,17 @@ function renderHome(){
    const events=dayEvents[day];
    let dayChg=0;
    const lines=events.map(e=>{
-    dayChg+=e.type==='income'?e.amt:-e.amt;
-    return `<div class="small" style="margin:2px 0"><span style="color:${e.type==='income'?'#198754':'#d64545'};font-weight:750">${e.type==='income'?'+':'-'}${money(e.amt)}</span> ${e.label}</div>`;
+    dayChg+=e.type==='income'||e.type==='transfer-in'?e.amt:-e.amt;
+    const isBudgeted=e.type==='budgeted';
+    const isTransfer=e.type==='transfer'||e.type==='transfer-in';
+    const highlightStyle=isTransfer?'background:#fffacd;border-left:3px solid #ffeb3b;padding-left:6px':'';
+    const amtColor=e.type==='income'||e.type==='transfer-in'?'#198754':(e.type==='transfer'?'#d64545':'#d64545');
+    return `<div class="small" style="margin:3px 0;display:grid;grid-template-columns:2fr 1fr;gap:12px;${highlightStyle}"><div><span style="color:${amtColor};font-weight:750">${e.type==='income'||e.type==='transfer-in'?'+':'-'}${money(e.amt)}</span> ${e.label}${isBudgeted?' (budgeted)':''}</div></div>`;
    }).join('');
    runningBal+=dayChg;
    const isNeg=runningBal<0;
-   return `<div style="margin-top:6px;border-top:1px solid var(--line);padding-top:6px">${lines}<div style="margin-top:3px;font-size:11px;font-style:italic;color:${isNeg?'#d64545':'var(--muted)'}${isNeg?';font-weight:700':''}">${money(runningBal)}</div></div>`;
+   const willGoNeg=events.some(e=>e.type==='budgeted'&&runningBal-e.amt<0);
+   return `<div style="margin-top:8px;border-top:1px solid var(--line);padding-top:8px"><div style="font-size:11px;font-weight:700;margin-bottom:4px">${day}</div>${lines}<div style="text-align:right;margin-top:4px;font-size:11px;font-style:italic;color:${isNeg?'#d64545':'var(--muted)'}${isNeg?';font-weight:700':''}">${money(runningBal)}</div>${willGoNeg?`<div style="font-size:10px;color:#666;background:#f0f0f0;padding:4px;border-radius:4px;margin-top:3px">⚠ Low balance</div>`:''}</div>`;
   }).join('');
   
   return `<div class="acctile"><div class="label">${a.label}</div><div class="amount" onclick="editAccBalance(${i})">${money(currentBal)}</div><div class="sub">Available balance</div>${entries}</div>`;
@@ -451,7 +471,7 @@ function renderFlexible(){
   const wouldGoNeg=spentFromBal-num(x.budget)<0;
   const acctStyle=wouldGoNeg&&!hasTransfer?'background:#d3d3d3;color:#666':'';
   
-  return `<div class="catitem" style="${hasTransfer?'background:#fffacd':''}"><div class="head"><input placeholder="e.g. Food" value="${x.label}" onchange="state.categories[${i}].label=this.value;render();save()"><input type="number" step="0.01" placeholder="Budget" value="${x.budget}" onchange="state.categories[${i}].budget=num(this.value);render();save()"><button onclick="state.categories.splice(${i},1);render();save()" style="border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0">×</button></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px"><div style="display:flex;flex-direction:column;gap:3px"><label style="font-size:10px;color:var(--muted);font-weight:700">Cadence</label><select onchange="state.categories[${i}].cadence=this.value;render();save()" style="padding:6px;font-size:13px"><option value="weekly" ${x.cadence==='weekly'?'selected':''}>Weekly</option><option value="biweekly" ${x.cadence==='biweekly'?'selected':''}>Biweekly</option><option value="monthly" ${x.cadence==='monthly'?'selected':''}>Monthly</option><option value="onetime" ${x.cadence==='onetime'?'selected':''}>One-time</option></select></div><div style="display:flex;flex-direction:column;gap:3px"><label style="font-size:10px;color:var(--muted);font-weight:700">Start date</label><input type="date" value="${x.startDate||todayStr()}" onchange="state.categories[${i}].startDate=this.value;render();save()" style="padding:6px;font-size:13px"></div></div><div style="margin-top:8px"><div style="display:flex;flex-direction:column;gap:3px"><label style="font-size:10px;color:var(--muted);font-weight:700">Spent from account</label><select onchange="state.categories[${i}].accountId=this.value;render();save()" style="padding:6px;font-size:13px;${acctStyle}">${state.accounts.map(a=>`<option value="${a.id}" ${a.id===x.accountId?'selected':''}>${a.label}</option>`).join('')}</select>${wouldGoNeg&&!hasTransfer?`<div style="margin-top:4px;font-size:10px;color:#666;background:#f0f0f0;padding:6px;border-radius:6px">⚠ Account needs funding to cover spending</div>`:''}</div></div><div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--line)"><label style="font-size:10px;color:var(--muted);font-weight:700;display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" ${hasTransfer?'checked':''} onchange="if(this.checked){state.categories[${i}].transferFromAccountId=state.categories[${i}].transferFromAccountId||'${state.accounts[0]?.id||''}';state.categories[${i}].transferDate=state.categories[${i}].transferDate||todayStr();}else{delete state.categories[${i}].transferFromAccountId;delete state.categories[${i}].transferDate;}render();save()" style="margin:0;width:14px;height:14px;cursor:pointer"> Transfer from?</label></div>${hasTransfer?`<div style="margin-top:6px"><div style="display:flex;flex-direction:column;gap:3px"><label style="font-size:10px;color:var(--muted);font-weight:700">Transfer from account</label><select onchange="state.categories[${i}].transferFromAccountId=this.value;render();save()" style="padding:6px;font-size:13px">${otherAccounts.map(a=>`<option value="${a.id}" ${a.id===x.transferFromAccountId?'selected':''}>${a.label}</option>`).join('')}</select></div></div>`:''}</div>`;
+  return `<div class="catitem" style="${hasTransfer?'background:#fffacd':''}"><div class="head"><input placeholder="e.g. Food" value="${x.label}" onchange="state.categories[${i}].label=this.value;render();save()"><input type="number" step="0.01" placeholder="Budget" value="${x.budget}" onchange="state.categories[${i}].budget=num(this.value);render();save()"><button onclick="state.categories.splice(${i},1);render();save()" style="border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0">×</button></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px"><div style="display:flex;flex-direction:column;gap:3px"><label style="font-size:10px;color:var(--muted);font-weight:700">Cadence</label><select onchange="state.categories[${i}].cadence=this.value;render();save()" style="padding:6px;font-size:13px"><option value="weekly" ${x.cadence==='weekly'?'selected':''}>Weekly</option><option value="biweekly" ${x.cadence==='biweekly'?'selected':''}>Biweekly</option><option value="monthly" ${x.cadence==='monthly'?'selected':''}>Monthly</option><option value="onetime" ${x.cadence==='onetime'?'selected':''}>One-time</option></select></div><div style="display:flex;flex-direction:column;gap:3px"><label style="font-size:10px;color:var(--muted);font-weight:700">Start date</label><input type="date" value="${x.startDate||todayStr()}" onchange="state.categories[${i}].startDate=this.value;render();save()" style="padding:6px;font-size:13px"></div></div><div style="margin-top:8px"><div style="display:flex;flex-direction:column;gap:3px"><label style="font-size:10px;color:var(--muted);font-weight:700">Spent from account</label><select onchange="state.categories[${i}].accountId=this.value;render();save()" style="padding:6px;font-size:13px;${acctStyle}">${state.accounts.map(a=>`<option value="${a.id}" ${a.id===x.accountId?'selected':''}>${a.label}</option>`).join('')}</select>${wouldGoNeg&&!hasTransfer?`<div style="margin-top:4px;font-size:10px;color:#666;background:#f0f0f0;padding:6px;border-radius:6px">⚠ Account needs funding to cover spending</div>`:''}</div></div><div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--line)"><label style="font-size:10px;color:var(--muted);font-weight:700;display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" ${hasTransfer?'checked':''} onchange="if(this.checked){state.categories[${i}].transferFromAccountId=state.categories[${i}].transferFromAccountId||'${state.accounts[0]?.id||''}';state.categories[${i}].transferDate=state.categories[${i}].transferDate||state.categories[${i}].startDate||todayStr();}else{delete state.categories[${i}].transferFromAccountId;delete state.categories[${i}].transferDate;}render();save()" style="margin:0;width:14px;height:14px;cursor:pointer"> Transfer from?</label></div>${hasTransfer?`<div style="margin-top:6px"><div style="display:flex;flex-direction:column;gap:3px"><label style="font-size:10px;color:var(--muted);font-weight:700">Transfer from account</label><select onchange="state.categories[${i}].transferFromAccountId=this.value;render();save()" style="padding:6px;font-size:13px">${otherAccounts.map(a=>`<option value="${a.id}" ${a.id===x.transferFromAccountId?'selected':''}>${a.label}</option>`).join('')}</select></div></div>`:''}</div>`;
  }).join('');
 }
 
@@ -492,7 +512,7 @@ function switchDebtStrategy(s){
 
 function addAccount(){state.accounts.push({id:uid(),label:'',balance:0});renderAccounts()}
 function addBill(){state.bills.push({id:uid(),label:'',amount:0,accountId:state.accounts[0]?.id||'',date:todayStr(),link:'',cadence:'monthly'});renderRecurring()}
-function addCat(){state.categories.push({id:uid(),label:'',budget:0,cadence:'monthly',accountId:state.accounts[0]?.id||''});renderFlexible()}
+function addCat(){state.categories.push({id:uid(),label:'',budget:0,cadence:'monthly',accountId:state.accounts[0]?.id||'',startDate:todayStr()});renderFlexible()}
 
 function saveTx(){
  const amt=num($('addAmt').value);if(amt<=0){toast('Enter an amount');return}
