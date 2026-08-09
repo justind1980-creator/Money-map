@@ -272,8 +272,6 @@ function renderHome(){
  
  $('homeAccounts').innerHTML=state.accounts.map((a,i)=>{
   const currentBal=num(a.balance)-spentFromAccount(a.id);
-  const budgeted=monthlyEquiv(state.bills.filter(b=>b.accountId===a.id));
-  const warning=currentBal<budgeted?`<div class="card" style="padding:10px;background:#fdeceb;border:1px solid #f6d4d1;border-radius:12px;margin-top:8px;font-size:12px;color:var(--danger);cursor:pointer" onclick="go('budget')"><b>⚠ Overspending</b><br>Bills scheduled: ${money(budgeted)}/mo but only ${money(currentBal)} available. Add funds or adjust bills.</div>`:'';
   
   const dayEvents={};
   state.income.forEach(inc=>{
@@ -303,7 +301,7 @@ function renderHome(){
    return `<div style="margin-top:6px;border-top:1px solid var(--line);padding-top:6px">${lines}<div style="margin-top:3px;font-size:11px;font-style:italic;color:${isNeg?'#d64545':'var(--muted)'}${isNeg?';font-weight:700':''}">${money(runningBal)}</div></div>`;
   }).join('');
   
-  return `<div class="acctile"><div class="label">${a.label}</div><div class="amount" onclick="editAccBalance(${i})">${money(currentBal)}</div><div class="sub">Available balance</div>${entries}${warning}</div>`;
+  return `<div class="acctile"><div class="label">${a.label}</div><div class="amount" onclick="editAccBalance(${i})">${money(currentBal)}</div><div class="sub">Available balance</div>${entries}</div>`;
  }).join('');
 }
 function switchType(t){
