@@ -19,7 +19,7 @@
 .page{padding:16px 18px}.eyebrow{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.08em}.title{font-size:28px;font-weight:850;margin:6px 0 18px}
 .hero{background:#17181a;color:#fff;border-radius:20px;padding:24px;margin-bottom:16px}.hero .label{color:#b9bbc0;font-size:13px}.hero .amount{font-size:42px;font-weight:900;margin:6px 0 2px}.hero .status{font-size:13px;color:#c9cbd0;margin-top:6px}
 .bigbtn{width:100%;border:0;border-radius:16px;padding:20px;background:#fff;border:2px solid var(--line);font-weight:850;font-size:17px;cursor:pointer;display:grid;place-items:center;text-align:center;color:var(--ink);transition:all .2s}
-.bigbtn:active{transform:scale(.98);border-color:var(--ink)}.bigbtn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.bigbtn:active{transform:scale(.98);border-color:var(--ink)}.bigbtn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}.bigbtn.success{background:#198754;border-color:#198754;color:#fff}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
 .card{background:var(--card);border-radius:16px;padding:16px;border:1px solid var(--line)}
 .label{font-size:12px;color:var(--muted);font-weight:700}.num{font-size:24px;font-weight:900;margin-top:6px}
@@ -35,12 +35,6 @@ input,select{width:100%;border:1px solid #d9dadd;background:#fff;border-radius:1
 .nav{max-width:430px;width:100%;display:flex}.nav button{flex:1;border:0;background:none;color:#8a8d93;font-size:10px;font-weight:700;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;cursor:pointer}.nav button.active{color:var(--ink)}.nav .ni{font-size:18px}
 .screen{display:none}.screen.active{display:block}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:90px;background:var(--ink);color:#fff;padding:10px 14px;border-radius:99px;font-size:13px;font-weight:700;display:none;z-index:30}
-.loading{display:flex;align-items:center;justify-content:center;min-height:100vh;color:var(--muted);font-weight:700}
-.onboarding{background:var(--bg);min-height:100vh;padding:40px 20px;display:flex;align-items:center;justify-content:center}
-.onboardcard{background:#fff;border-radius:20px;padding:28px 20px;max-width:380px;width:100%;box-shadow:0 2px 8px rgba(0,0,0,.08)}
-.onboardpct{font-size:12px;color:var(--muted);font-weight:700;margin-bottom:12px}
-.onboardtitle{font-size:26px;font-weight:850;margin-bottom:8px}
-.onboardsub{font-size:14px;color:var(--muted);margin-bottom:20px}
 .segmented{display:flex;background:#eef0f2;border-radius:11px;padding:3px;gap:3px}
 .segmented button{flex:1;border:0;background:none;padding:8px 6px;border-radius:8px;font-weight:750;font-size:13px;color:#74777d;cursor:pointer}
 .segmented button.active{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
@@ -68,36 +62,31 @@ input,select{width:100%;border:1px solid #d9dadd;background:#fff;border-radius:1
 .billitem .link-field{display:flex;gap:6px;align-items:center;margin-bottom:8px}
 .billitem .link-field input{flex:1;padding:8px;font-size:12px}
 .billitem .link-field button{flex:0 0 80px;border:0;border-radius:8px;background:#eef0f2;color:var(--ink);font-weight:700;font-size:11px;cursor:pointer;padding:8px}
+.debtbtn{border:0;background:#eef0f2;color:var(--ink);padding:8px 12px;border-radius:8px;font-weight:700;font-size:11px;cursor:pointer}
+.debtbtn.active{background:#d64545;color:#fff}
+.debtrow{background:#f9f9f9;border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.debtrow .mini{display:flex;flex-direction:column;gap:3px}
+.debtrow .mini label{font-size:10px;color:var(--muted);font-weight:700}
+.debtrow .mini input{padding:6px;font-size:13px;border:1px solid #d9dadd;background:#fff;border-radius:8px}
 .catitem{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff;margin-bottom:8px}
 .catitem .head{display:flex;gap:8px;align-items:center;margin-bottom:8px}
 .catitem .head input:first-child{flex:1}
 .catitem .head input:last-of-type{width:100px;text-align:right}
 .catitem .head .del{flex:0 0 28px;border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0}
-.catitem .bar{display:flex;align-items:center;gap:6px;font-size:11px}.catitem .bar .pct{font-weight:750;color:var(--ink)}
 .txitem{border:1px solid var(--line);border-radius:12px;padding:11px;background:#fff;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .txitem .info{flex:1}.txitem .info .label{font-size:13px;font-weight:750}.txitem .info .meta{font-size:11px;color:var(--muted);margin-top:1px}
-.txitem .amt{font-weight:850;white-space:nowrap}.txitem .del{flex:0 0 28px;border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0}
+.txitem .amt{font-weight:850;white-space:nowrap}
 .acctile{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff;margin-bottom:8px}
 .acctile .label{font-size:12px;color:var(--muted);font-weight:700;margin-bottom:4px}
-.acctile .amount{font-size:24px;font-weight:900}
+.acctile .amount{font-size:24px;font-weight:900;cursor:pointer}
 .acctile .sub{font-size:11px;color:var(--muted);margin-top:3px}
+.debtcard{border-left:4px solid #d64545;background:#fff;border-radius:12px;padding:12px;margin-bottom:8px;border:1px solid var(--line)}
+.debtcard .name{font-weight:750;font-size:13px;margin-bottom:6px}
+.debtcard .stats{font-size:11px;color:var(--muted);line-height:1.6}
 </style>
 </head>
 <body>
 <div class="phone">
-
-<div id="onboarding" class="onboarding">
-<div class="onboardcard">
-<div class="onboardpct" id="onboardPct">Loading...</div>
-<div class="onboardtitle" id="onboardTitle">Money Map</div>
-<div class="onboardsub" id="onboardSub">Opening...</div>
-<div id="onboardForm" class="form"></div>
-<div style="display:flex;gap:9px;margin-top:16px">
-<button id="backBtn" class="btn secondary" onclick="prevOnboard()" style="display:none">Back</button>
-<button class="btn" onclick="nextOnboard()" style="flex:1">Next</button>
-</div>
-</div>
-</div>
 
 <div id="app" style="display:none">
 <div class="top">
@@ -111,7 +100,7 @@ input,select{width:100%;border:1px solid #d9dadd;background:#fff;border-radius:1
 </div>
 
 <div class="grid2">
-<button class="bigbtn primary" onclick="switchType('income');go('addexp')">➕ Income</button>
+<button class="bigbtn success" onclick="switchType('income');go('addexp')">➕ Income</button>
 <button class="bigbtn" style="background:#fdeceb;border-color:#f6d4d1;color:var(--danger)" onclick="switchType('expense');go('addexp')">- Expense</button>
 </div>
 
@@ -124,6 +113,9 @@ input,select{width:100%;border:1px solid #d9dadd;background:#fff;border-radius:1
 <div class="sectionhead"><h2>Recent spending</h2></div>
 <div id="homeTransactions"></div>
 </div>
+
+<div style="height:12px"></div>
+<button class="btn danger" onclick="resetAll()">Reset all</button>
 </div>
 
 <div id="addexp" class="screen page">
@@ -154,6 +146,7 @@ input,select{width:100%;border:1px solid #d9dadd;background:#fff;border-radius:1
 <div class="field"><label>Amount</label><input id="addIncAmt" type="number" min="0" step="0.01" placeholder="0.00"></div>
 <div class="field"><label>Frequency</label><select id="addIncCadence"><option value="weekly">Weekly</option><option value="biweekly">Biweekly</option><option value="monthly" selected>Monthly</option><option value="onetime">One-time</option></select></div>
 <div class="field"><label>Date</label><input id="addIncDate" type="date"></div>
+<div class="field"><label>To account</label><select id="addIncAccount"></select></div>
 </div>
 <div style="height:12px"></div>
 <button class="btn" onclick="saveIncome()">Add income</button>
@@ -168,7 +161,7 @@ input,select{width:100%;border:1px solid #d9dadd;background:#fff;border-radius:1
 <div class="status" id="txresStatus">Balance updated</div>
 </div>
 <div class="section">
-<div class="sectionhead"><h2" id="txresAccLabel">Account</h2></div>
+<div class="sectionhead"><h2 id="txresAccLabel">Account</h2></div>
 <div class="card">
 <div class="row"><span>New balance</span><b id="txresNewBal">$0</b></div>
 <div class="row"><span>Category remaining</span><b id="txresRemaining">$0</b></div>
@@ -177,7 +170,23 @@ input,select{width:100%;border:1px solid #d9dadd;background:#fff;border-radius:1
 <button class="btn" onclick="go('home')" style="margin:16px 18px 0">Done</button>
 </div>
 
+<div id="recurring" class="screen page">
+<button class="link" style="margin-bottom:12px" onclick="go('home')">← Back</button>
+<div class="title">Recurring bills</div>
+<div id="billsList"></div>
+<button class="btn secondary" onclick="addBill()">+ Add bill</button>
+</div>
+
+<div id="flexible" class="screen page">
+<button class="link" style="margin-bottom:12px" onclick="go('home')">← Back</button>
+<div class="title">Flexible spending</div>
+<div class="small" style="margin-bottom:12px">Set your budget for each category. We'll track spending as you log expenses.</div>
+<div id="catList"></div>
+<button class="btn secondary" onclick="addCat()">+ Add category</button>
+</div>
+
 <div id="budget" class="screen page">
+<button class="link" style="margin-bottom:12px" onclick="go('home')">← Back</button>
 <div class="title">Budget</div>
 
 <div class="section">
@@ -188,14 +197,14 @@ input,select{width:100%;border:1px solid #d9dadd;background:#fff;border-radius:1
 </div>
 
 <div class="section">
-<div class="sectionhead"><h2>Recurring bills</h2><button class="link" onclick="go('editbills')">Manage</button></div>
+<div class="sectionhead"><h2>Recurring bills</h2></div>
 <div class="card">
 <div id="budgetBills"></div>
 </div>
 </div>
 
 <div class="section">
-<div class="sectionhead"><h2>Flexible spending</h2><button class="link" onclick="go('editcats')">Manage</button></div>
+<div class="sectionhead"><h2>Flexible spending</h2></div>
 <div id="budgetCats"></div>
 </div>
 
@@ -205,45 +214,35 @@ input,select{width:100%;border:1px solid #d9dadd;background:#fff;border-radius:1
 </div>
 </div>
 
+<div id="debts" class="screen page">
+<button class="link" style="margin-bottom:12px" onclick="go('home')">← Back</button>
+<div class="title">Debts</div>
+
+<div class="card" style="margin-bottom:16px">
+<div class="segmented" id="debtStrategy" style="width:100%">
+<button class="active" data-strategy="snowball" onclick="switchDebtStrategy('snowball')">Snowball</button>
+<button data-strategy="avalanche" onclick="switchDebtStrategy('avalanche')">Avalanche</button>
+</div>
+</div>
+
+<div id="debtsList"></div>
+</div>
+
 <div id="editacc" class="screen page">
-<button class="link" style="margin-bottom:12px" onclick="go('settings')">← Back</button>
+<button class="link" style="margin-bottom:12px" onclick="go('home')">← Back</button>
 <div class="title">Your accounts</div>
 <div id="accountList"></div>
 <button class="btn secondary" onclick="addAccount()">+ Add account</button>
-</div>
-
-
-
-<div id="editbills" class="screen page">
-<button class="link" style="margin-bottom:12px" onclick="go('budget')">← Back</button>
-<div class="title">Recurring bills</div>
-<div id="billsList"></div>
-<button class="btn secondary" onclick="addBill()">+ Add bill</button>
-</div>
-
-<div id="editcats" class="screen page">
-<button class="link" style="margin-bottom:12px" onclick="go('budget')">← Back</button>
-<div class="title">Flexible spending</div>
-<div class="small" style="margin-bottom:12px">Set your budget for each category. We'll track spending as you log expenses.</div>
-<div id="catList"></div>
-<button class="btn secondary" onclick="addCat()">+ Add category</button>
-</div>
-
-<div id="settings" class="screen page">
-<button class="link" style="margin-bottom:12px" onclick="go('home')">← Back</button>
-<div class="title">Settings</div>
-
-<div style="height:12px"></div>
-<button class="btn danger" onclick="resetAll()">Start over</button>
 </div>
 
 </div>
 
 <div class="bottom"><div class="nav">
 <button class="active" data-go="home"><span class="ni">⌂</span>Home</button>
-<button data-go="addexp"><span class="ni">➕</span>Add</button>
+<button data-go="recurring"><span class="ni">📋</span>Recurring</button>
+<button data-go="flexible"><span class="ni">💰</span>Flexible</button>
 <button data-go="budget"><span class="ni">📊</span>Budget</button>
-<button data-go="settings"><span class="ni">⚙</span>Settings</button>
+<button data-go="debts"><span class="ni">💳</span>Debts</button>
 </div></div>
 </div>
 
@@ -256,21 +255,15 @@ const num=x=>{const v=Number(x);return isFinite(v)?v:0};
 const uid=()=>'id'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const todayStr=()=>new Date().toISOString().slice(0,10);
 
-let state={accounts:[{id:uid(),label:'Checking',balance:0}],income:[],bills:[],categories:[],transactions:[],period:'monthly',onboarded:true};
-let onboardStep=0;
+let state={accounts:[{id:uid(),label:'Checking',balance:0}],income:[],bills:[],categories:[],transactions:[],period:'monthly',debtStrategy:'snowball',onboarded:true};
+let debtExpanded={};
 
 async function safeGet(k){try{return JSON.parse(localStorage.getItem(k)||'null')}catch(e){return null}}
 async function safeSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}
 function save(){safeSet('mm_v4',state)}
 function toast(m){$('toast').textContent=m;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',1400)}
 
-function render(){renderHome();renderAdd();renderBudget();renderSettings();renderAccounts();renderIncome();renderBills();renderCats()}
-function toggleIncomeEdit(){
- const form=$('incomeEditForm');
- const show=form.style.display==='none';
- form.style.display=show?'block':'none';
- if(show) renderIncome();
-}
+function render(){renderHome();renderAdd();renderBudget();renderRecurring();renderFlexible();renderAccounts();renderDebts()}
 function renderHome(){
  const totalBalance=state.accounts.reduce((s,a)=>s+num(a.balance)-spentFromAccount(a.id),0);
  $('heroAmount').textContent=money(totalBalance);
@@ -279,11 +272,11 @@ function renderHome(){
   const bal=num(a.balance)-spentFromAccount(a.id);
   const budgeted=monthlyEquiv(state.bills.filter(b=>b.accountId===a.id));
   const warning=bal<budgeted?`<div class="card" style="padding:10px;background:#fdeceb;border:1px solid #f6d4d1;border-radius:12px;margin-top:8px;font-size:12px;color:var(--danger)"><b>⚠ Overspending</b><br>Bills scheduled: ${money(budgeted)}/mo but only ${money(bal)} available. Add funds or adjust bills.</div>`:'';
-  return `<div class="acctile"><div class="label">${a.label}</div><div class="amount" onclick="editAccBalance(${i})" style="cursor:pointer">${money(bal)}</div><div class="sub">Available balance</div>${warning}</div>`;
+  return `<div class="acctile"><div class="label">${a.label}</div><div class="amount" onclick="editAccBalance(${i})">${money(bal)}</div><div class="sub">Available balance</div>${warning}</div>`;
  }).join('');
  
  const recentTx=[...state.transactions].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
- $('homeTransactions').innerHTML=recentTx.map((t,ti)=>{const cat=state.categories.find(c=>c.id===t.catId);const txIdx=state.transactions.indexOf(t);return `<div class="txitem"><div class="info"><div class="label">${t.note||cat?.label||'Expense'}</div><div class="meta">${cat?.label||''}${cat?'·':''}${t.date}</div></div><div style="display:flex;gap:8px;align-items:center"><div class="amt">-${money(t.amount)}</div><button class="txdel" onclick="state.transactions.splice(${txIdx},1);render();save()">×</button></div></div>`}).join('')||`<div class="card">No transactions yet.</div>`;
+ $('homeTransactions').innerHTML=recentTx.map((t,ti)=>{const cat=state.categories.find(c=>c.id===t.catId);const txIdx=state.transactions.indexOf(t);return `<div class="txitem"><div class="info"><div class="label">${t.note||cat?.label||'Expense'}</div><div class="meta">${cat?.label||''}${cat?'·':''}${t.date}</div></div><div style="display:flex;gap:8px;align-items:center"><div class="amt">-${money(t.amount)}</div><button onclick="state.transactions.splice(${txIdx},1);render();save()" style="border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0">×</button></div></div>`}).join('')||`<div class="card">No transactions yet.</div>`;
 }
 function switchType(t){
  document.querySelectorAll('#incexpToggle button').forEach(b=>b.classList.toggle('active',b.dataset.type===t));
@@ -293,15 +286,17 @@ function switchType(t){
 function renderAdd(){
  $('addCat').innerHTML=state.categories.map(c=>`<option value="${c.id}">${c.label}</option>`).join('');
  $('addAcc').innerHTML=state.accounts.map(a=>`<option value="${a.id}">${a.label}</option>`).join('');
+ $('addIncAccount').innerHTML=state.accounts.map(a=>`<option value="${a.id}">${a.label}</option>`).join('');
  if(!$('addDate').value)$('addDate').value=todayStr();
  if(!$('addIncDate').value)$('addIncDate').value=todayStr();
 }
 function saveIncome(){
  const label=$('addIncLabel').value;
  const amt=num($('addIncAmt').value);
+ const accId=$('addIncAccount').value;
  if(!label){toast('Enter an income name');return}
  if(amt<=0){toast('Enter an amount');return}
- state.income.push({id:uid(),label,amount:amt,cadence:$('addIncCadence').value,date:$('addIncDate').value||todayStr()});
+ state.income.push({id:uid(),label,amount:amt,cadence:$('addIncCadence').value,date:$('addIncDate').value||todayStr(),accountId:accId});
  save();
  $('addIncLabel').value='';$('addIncAmt').value='';$('addIncCadence').value='monthly';
  go('home');render();
@@ -371,7 +366,7 @@ function renderDaily(){
   });
  });
  
- const sortedDays = Object.keys(dayEvents).sort();
+ const sortedDays = Object.keys(dayEvents).sort().filter(d => d >= today);
  let runningBal = startBal;
  
  $('budgetDaily').innerHTML = sortedDays.map(day => {
@@ -384,36 +379,59 @@ function renderDaily(){
   runningBal += dayChg;
   const isNeg = runningBal < 0;
   return `<div class="card" style="padding:12px;margin-bottom:8px;border-left:4px solid ${isNeg?'#d64545':'#17181a'}"><div style="font-weight:750;font-size:13px;margin-bottom:6px">${day}</div>${lines}<div style="margin-top:6px;font-weight:800;color:${isNeg?'#d64545':'#17181a'}">Balance: ${money(runningBal)}</div></div>`;
- }).join('') || '<div class="small">No income or bills scheduled this month.</div>';
+ }).join('') || '<div class="small">No income or bills scheduled this month forward.</div>';
 }
 
-function renderSettings(){}
-function renderAccounts(){
- $('accountList').innerHTML=state.accounts.map((a,i)=>`<div class="accitem"><div class="head"><input placeholder="Account name" value="${a.label}" onchange="state.accounts[${i}].label=this.value;render();save()"><input type="number" step="0.01" placeholder="0.00" value="${a.balance}" onchange="state.accounts[${i}].balance=num(this.value);render();save()"><button class="del" onclick="state.accounts.splice(${i},1);render();save()">×</button></div><div class="bal">Balance: ${money(num(a.balance)-spentFromAccount(a.id))}</div></div>`).join('');
+function renderRecurring(){
+ $('billsList').innerHTML=state.bills.map((x,i)=>{const acc=state.accounts.find(a=>a.id===x.accountId);const expanded=debtExpanded[x.id];return `<div class="billitem"><div class="top"><input placeholder="e.g. Electricity" value="${x.label}" onchange="state.bills[${i}].label=this.value;render();save()"><input type="number" step="0.01" placeholder="0.00" value="${x.amount}" onchange="state.bills[${i}].amount=num(this.value);render();save()"><button class="debtbtn ${x.isDebt?'active':''}" onclick="toggleDebt(${i})">DEBT</button><button onclick="state.bills.splice(${i},1);render();save()" style="border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0">×</button></div><div class="grid2"><div class="mini"><label>From account</label><select onchange="state.bills[${i}].accountId=this.value;render();save()">${state.accounts.map(a=>`<option value="${a.id}" ${a.id===x.accountId?'selected':''}>${a.label}</option>`).join('')}</select></div><div class="mini"><label>Frequency</label><select onchange="state.bills[${i}].cadence=this.value;render();save()"><option value="weekly" ${x.cadence==='weekly'?'selected':''}>Weekly</option><option value="biweekly" ${x.cadence==='biweekly'?'selected':''}>Biweekly</option><option value="monthly" ${x.cadence==='monthly'?'selected':''}>Monthly</option><option value="onetime" ${x.cadence==='onetime'?'selected':''}>One-time</option></select></div><div class="mini"><label>Due date</label><input type="date" value="${x.date||''}" onchange="state.bills[${i}].date=this.value;render();save()"></div></div><div class="link-field"><input type="url" placeholder="https://..." value="${x.link||''}" onchange="state.bills[${i}].link=this.value;save()"><button onclick="if(state.bills[${i}].link)window.open(state.bills[${i}].link)">Visit</button></div>${expanded?`<div class="debtrow"><div class="mini"><label>APR %</label><input type="number" step="0.01" value="${x.apr||''}" onchange="state.bills[${i}].apr=num(this.value);save()" placeholder="5.5"></div><div class="mini"><label>Term (months)</label><input type="number" value="${x.term||''}" onchange="state.bills[${i}].term=num(this.value);save()" placeholder="60"></div><div class="mini"><label>End Date</label><input type="date" value="${x.endDate||''}" onchange="state.bills[${i}].endDate=this.value;save()"></div><div class="mini"><label>Payoff Amount</label><input type="number" step="0.01" value="${x.payoff||''}" onchange="state.bills[${i}].payoff=num(this.value);save()" placeholder="0.00"></div><div class="mini"><label>Payoff Date</label><input type="date" value="${x.payoffDate||''}" onchange="state.bills[${i}].payoffDate=this.value;save()"></div></div>`:''}\n</div>`}).join('');
 }
-function renderIncome(){
- $('incomeList').innerHTML=state.income.map((x,i)=>`<div class="incitem"><div class="top"><input placeholder="e.g. Paycheck" value="${x.label}" onchange="state.income[${i}].label=this.value;render();save()"><input type="number" step="0.01" placeholder="0.00" value="${x.amount}" onchange="state.income[${i}].amount=num(this.value);render();save()"><button class="del" onclick="state.income.splice(${i},1);render();save()">×</button></div><div class="cadence"><select onchange="state.income[${i}].cadence=this.value;render();save()"><option value="weekly" ${x.cadence==='weekly'?'selected':''}>Weekly</option><option value="biweekly" ${x.cadence==='biweekly'?'selected':''}>Biweekly</option><option value="monthly" ${x.cadence==='monthly'?'selected':''}>Monthly</option><option value="onetime" ${x.cadence==='onetime'?'selected':''}>One-time</option></select><input type="date" value="${x.date||''}" onchange="state.income[${i}].date=this.value;render();save()" placeholder="Date"></div></div>`).join('');
+
+function toggleDebt(i){
+ state.bills[i].isDebt=!state.bills[i].isDebt;
+ if(state.bills[i].isDebt){
+  debtExpanded[state.bills[i].id]=true;
+ }else{
+  delete debtExpanded[state.bills[i].id];
+ }
+ save();render();
 }
+
+function renderFlexible(){
+ $('catList').innerHTML=state.categories.map((x,i)=>{const acc=state.accounts.find(a=>a.id===x.accountId);return `<div class="catitem"><div class="head"><input placeholder="e.g. Food" value="${x.label}" onchange="state.categories[${i}].label=this.value;render();save()"><input type="number" step="0.01" placeholder="Budget" value="${x.budget}" onchange="state.categories[${i}].budget=num(this.value);render();save()"><button onclick="state.categories.splice(${i},1);render();save()" style="border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0">×</button></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px"><div style="display:flex;flex-direction:column;gap:3px"><label style="font-size:10px;color:var(--muted);font-weight:700">Cadence</label><select onchange="state.categories[${i}].cadence=this.value;render();save()" style="padding:6px;font-size:13px"><option value="weekly" ${x.cadence==='weekly'?'selected':''}>Weekly</option><option value="biweekly" ${x.cadence==='biweekly'?'selected':''}>Biweekly</option><option value="monthly" ${x.cadence==='monthly'?'selected':''}>Monthly</option></select></div><div style="display:flex;flex-direction:column;gap:3px"><label style="font-size:10px;color:var(--muted);font-weight:700">From account</label><select onchange="state.categories[${i}].accountId=this.value;render();save()" style="padding:6px;font-size:13px">${state.accounts.map(a=>`<option value="${a.id}" ${a.id===x.accountId?'selected':''}>${a.label}</option>`).join('')}</select></div></div></div>`}).join('');
+}
+
 function renderBudgetIncome(){
- $('budgetIncome').innerHTML=state.income.map(x=>`<div class="row" style="padding:10px 0"><div><span class="small">${x.label}</span><br><span class="small" style="font-size:10px;color:var(--muted)">${x.cadence}${x.cadence!=='onetime'?'':''} • ${x.date}</span></div><b>${money(x.amount)}</b></div>`).join('')||`<div class="small">No income set up.</div>`;
-}
-function renderBills(){
- $('billsList').innerHTML=state.bills.map((x,i)=>{const acc=state.accounts.find(a=>a.id===x.accountId);return `<div class="billitem"><div class="top"><input placeholder="e.g. Electricity" value="${x.label}" onchange="state.bills[${i}].label=this.value;render();save()"><input type="number" step="0.01" placeholder="0.00" value="${x.amount}" onchange="state.bills[${i}].amount=num(this.value);render();save()"><button class="del" onclick="state.bills.splice(${i},1);render();save()">×</button></div><div class="grid2"><div class="mini"><label>From account</label><select onchange="state.bills[${i}].accountId=this.value;render();save()">${state.accounts.map(a=>`<option value="${a.id}" ${a.id===x.accountId?'selected':''}>${a.label}</option>`).join('')}</select></div><div class="mini"><label>Frequency</label><select onchange="state.bills[${i}].cadence=this.value;render();save()"><option value="weekly" ${x.cadence==='weekly'?'selected':''}>Weekly</option><option value="biweekly" ${x.cadence==='biweekly'?'selected':''}>Biweekly</option><option value="monthly" ${x.cadence==='monthly'?'selected':''}>Monthly</option><option value="onetime" ${x.cadence==='onetime'?'selected':''}>One-time</option></select></div><div class="mini"><label>Due date</label><input type="date" value="${x.date||''}" onchange="state.bills[${i}].date=this.value;render();save()"></div></div><div class="link-field"><input type="url" placeholder="https://..." value="${x.link||''}" onchange="state.bills[${i}].link=this.value;save()"><button onclick="if(state.bills[${i}].link)window.open(state.bills[${i}].link)">Visit</button></div></div>`}).join('');
+ $('budgetIncome').innerHTML=state.income.map(x=>{const acc=state.accounts.find(a=>a.id===x.accountId);return `<div class="row" style="padding:10px 0"><div><span class="small">${x.label}</span><br><span class="small" style="font-size:10px;color:var(--muted)">${x.cadence} • ${x.date} • ${acc?.label||'Account'}</span></div><b>${money(x.amount)}</b></div>`}).join('')||`<div class="small">No income set up.</div>`;
 }
 function renderBudgetBills(){
  $('budgetBills').innerHTML=state.bills.filter(b=>!b.isDebt).map(x=>{const acc=state.accounts.find(a=>a.id===x.accountId);return `<div class="row" style="padding:10px 0"><div><span class="small">${x.label}</span><br><span class="small" style="font-size:10px;color:var(--muted)">${x.cadence} • ${x.date} • ${acc?.label}</span></div><b>-${money(x.amount)}</b></div>`}).join('')||`<div class="small">No bills set up.</div>`;
-}
-function renderCats(){
- $('catList').innerHTML=state.categories.map((x,i)=>`<div class="catitem"><div class="head"><input placeholder="e.g. Food" value="${x.label}" onchange="state.categories[${i}].label=this.value;render();save()"><input type="number" step="0.01" placeholder="Budget" value="${x.budget}" onchange="state.categories[${i}].budget=num(this.value);render();save()"><button class="del" onclick="state.categories.splice(${i},1);render();save()">×</button></div><div class="cadence" style="margin-top:8px"><select onchange="state.categories[${i}].cadence=this.value;render();save()" style="flex:1"><option value="weekly" ${x.cadence==='weekly'?'selected':''}>Weekly</option><option value="biweekly" ${x.cadence==='biweekly'?'selected':''}>Biweekly</option><option value="monthly" ${x.cadence==='monthly'?'selected':''}>Monthly</option></select></div></div>`).join('');
 }
 function renderBudgetCats(){
  $('budgetCats').innerHTML=state.categories.map(c=>{const spent=spentThisPeriod(c.id);const left=num(c.budget)-spent;const pct=num(c.budget)>0?Math.min(100,spent/num(c.budget)*100):0;return `<div class="card" style="padding:12px;margin-bottom:8px"><div class="row" style="padding:0;border:0;margin-bottom:6px"><span><b>${c.label}</b><br><span class="small" style="font-size:10px;color:var(--muted)">${c.cadence}</span></span><span class="bold">${money(spent)}/${money(c.budget)}</span></div><div class="progress"><div style="width:${pct}%;background:${left<0?'#d64545':'#17181a'}"></div></div></div>`}).join('')||`<div class="card">No flexible categories yet.</div>`;
 }
 
+function renderDebts(){
+ const debts=state.bills.filter(b=>b.isDebt&&num(b.amount)>0);
+ const sorted=debts.slice().sort((a,b)=>{
+  if(state.debtStrategy==='snowball'){
+   return num(a.amount)-num(b.amount);
+  }else{
+   return num(b.apr||0)-num(a.apr||0);
+  }
+ });
+ $('debtsList').innerHTML=sorted.map(d=>{const acc=state.accounts.find(a=>a.id===d.accountId);return `<div class="debtcard"><div class="name">${d.label}</div><div class="stats"><div>Balance: ${money(d.amount)}</div><div>APR: ${d.apr||'N/A'}%</div><div>Term: ${d.term||'N/A'} months</div><div>End Date: ${d.endDate||'N/A'}</div><div>Payoff: ${money(d.payoff||0)} on ${d.payoffDate||'N/A'}</div><div style="margin-top:4px;font-size:10px;color:var(--ink)">From: ${acc?.label}</div></div></div>`}).join('')||`<div class="card">No debts tracked yet. Mark bills as DEBT in Recurring to add them.</div>`;
+}
+
+function switchDebtStrategy(s){
+ state.debtStrategy=s;
+ document.querySelectorAll('#debtStrategy button').forEach(b=>b.classList.toggle('active',b.dataset.strategy===s));
+ renderDebts();
+ save();
+}
+
 function addAccount(){state.accounts.push({id:uid(),label:'',balance:0});renderAccounts()}
-function addIncome(){state.income.push({id:uid(),label:'',amount:0,cadence:'monthly',date:todayStr()});renderIncome()}
-function addBill(){state.bills.push({id:uid(),label:'',amount:0,accountId:state.accounts[0]?.id||'',date:todayStr(),link:'',isDebt:false,cadence:'monthly'});renderBills()}
-function addCat(){state.categories.push({id:uid(),label:'',budget:0,cadence:'monthly'});renderCats()}
+function addBill(){state.bills.push({id:uid(),label:'',amount:0,accountId:state.accounts[0]?.id||'',date:todayStr(),link:'',isDebt:false,cadence:'monthly'});renderRecurring()}
+function addCat(){state.categories.push({id:uid(),label:'',budget:0,cadence:'monthly',accountId:state.accounts[0]?.id||''});renderFlexible()}
 
 function saveTx(){
  const amt=num($('addAmt').value);if(amt<=0){toast('Enter an amount');return}
@@ -451,12 +469,15 @@ function go(id){
  window.scrollTo({top:0,behavior:'smooth'});
 }
 document.querySelectorAll('.nav button').forEach(x=>x.onclick=()=>go(x.dataset.go));
-document.querySelectorAll('#budget [data-period]').forEach(b=>b.onclick=()=>{state.period=b.dataset.period;render();save()});
 
 function editAccBalance(i){
  const a=state.accounts[i];
  const newBal=prompt(`Edit balance for ${a.label}:`,a.balance);
  if(newBal!==null){a.balance=num(newBal);save();render();}
+}
+
+function renderAccounts(){
+ $('accountList').innerHTML=state.accounts.map((a,i)=>`<div class="accitem"><div class="head"><input placeholder="Account name" value="${a.label}" onchange="state.accounts[${i}].label=this.value;render();save()"><input type="number" step="0.01" placeholder="0.00" value="${a.balance}" onchange="state.accounts[${i}].balance=num(this.value);render();save()"><button onclick="state.accounts.splice(${i},1);render();save()" style="border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0">×</button></div><div class="bal">Balance: ${money(num(a.balance)-spentFromAccount(a.id))}</div></div>`).join('');
 }
 
 async function resetAll(){if(confirm('Erase everything?')){localStorage.removeItem('mm_v4');location.reload()}}
@@ -465,7 +486,6 @@ async function init(){
  const saved=await safeGet('mm_v4');
  if(saved){state=saved;}
  try{render();}catch(e){console.log(e)}
- $('onboarding').style.display='none';
  $('app').style.display='block';
  setTimeout(()=>go('home'),100);
 }
