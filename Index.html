@@ -220,7 +220,7 @@ input,select{width:100%;border:1px solid #d9dadd;background:#fff;border-radius:1
 </div>
 
 <div id="editacc" class="screen page">
-<div class="title">Your accounts</div>
+<div class="title">Accounts</div>
 <div id="accountList"></div>
 <button class="btn secondary" onclick="addAccount()">+ Add account</button>
 </div>
@@ -286,33 +286,33 @@ function renderHome(){
     const transferDate=cat.transferDate;
     if(transferDate>=monthStartStr&&transferDate<=monthEndStr){
      if(!dayEvents[transferDate])dayEvents[transferDate]=[];
-     dayEvents[transferDate].push({type:'transfer',label:`Transfer to ${state.accounts.find(ac=>ac.id===cat.accountId)?.label||'Account'} (${cat.label})`,amt:num(cat.budget),highlight:true,isInitial:true});
+     dayEvents[transferDate].push({type:'transfer',label:`Transfer to ${state.accounts.find(ac=>ac.id===cat.accountId)?.label||'Account'} (${cat.label})`,amt:num(cat.budget),highlight:true,isInitial:true,isIncoming:false});
     }
     const futureStartDate=new Date(transferDate+'T00:00:00');
     futureStartDate.setDate(futureStartDate.getDate()+(cat.cadence==='weekly'?7:cat.cadence==='biweekly'?14:30));
     const futureStartStr=futureStartDate.toISOString().slice(0,10);
     if(futureStartStr<=monthEndStr){
      const futureDates=getNextOccurrences({date:futureStartStr,cadence:cat.cadence},futureStartStr,monthEndStr,cat.cadence||'monthly');
-     futureDates.forEach(d=>{if(!dayEvents[d])dayEvents[d]=[];dayEvents[d].push({type:'income',label:`Transfer to ${state.accounts.find(ac=>ac.id===cat.accountId)?.label||'Account'} (${cat.label})`,amt:num(cat.budget),highlight:false});});
+     futureDates.forEach(d=>{if(!dayEvents[d])dayEvents[d]=[];dayEvents[d].push({type:'transfer',label:`Transfer to ${state.accounts.find(ac=>ac.id===cat.accountId)?.label||'Account'} (${cat.label})`,amt:num(cat.budget),highlight:false,isIncoming:false});});
     }
    }else if(!cat.transferFromAccountId&&cat.accountId===a.id){
     const startDate=cat.startDate||todayStr();
     if(startDate>=monthStartStr&&startDate<=monthEndStr){
      if(!dayEvents[startDate])dayEvents[startDate]=[];
-     dayEvents[startDate].push({type:'budgeted',label:cat.label,amt:num(cat.budget),catId:cat.id,highlight:false});
+     dayEvents[startDate].push({type:'budgeted',label:cat.label,amt:num(cat.budget),catId:cat.id,highlight:false,isIncoming:false});
     }
    }else if(cat.transferFromAccountId&&cat.accountId===a.id&&cat.transferDate){
     const transferDate=cat.transferDate;
     if(transferDate>=monthStartStr&&transferDate<=monthEndStr){
      if(!dayEvents[transferDate])dayEvents[transferDate]=[];
-     dayEvents[transferDate].push({type:'transfer-in',label:`Transfer from ${state.accounts.find(ac=>ac.id===cat.transferFromAccountId)?.label||'Account'} (${cat.label})`,amt:num(cat.budget),highlight:true,isInitial:true});
+     dayEvents[transferDate].push({type:'transfer',label:`Transfer from ${state.accounts.find(ac=>ac.id===cat.transferFromAccountId)?.label||'Account'} (${cat.label})`,amt:num(cat.budget),highlight:true,isInitial:true,isIncoming:true});
     }
     const futureStartDate=new Date(transferDate+'T00:00:00');
     futureStartDate.setDate(futureStartDate.getDate()+(cat.cadence==='weekly'?7:cat.cadence==='biweekly'?14:30));
     const futureStartStr=futureStartDate.toISOString().slice(0,10);
     if(futureStartStr<=monthEndStr){
      const futureDates=getNextOccurrences({date:futureStartStr,cadence:cat.cadence},futureStartStr,monthEndStr,cat.cadence||'monthly');
-     futureDates.forEach(d=>{if(!dayEvents[d])dayEvents[d]=[];dayEvents[d].push({type:'income',label:`Transfer from ${state.accounts.find(ac=>ac.id===cat.transferFromAccountId)?.label||'Account'} (${cat.label})`,amt:num(cat.budget),highlight:false});});
+     futureDates.forEach(d=>{if(!dayEvents[d])dayEvents[d]=[];dayEvents[d].push({type:'transfer',label:`Transfer from ${state.accounts.find(ac=>ac.id===cat.transferFromAccountId)?.label||'Account'} (${cat.label})`,amt:num(cat.budget),highlight:false,isIncoming:true});});
     }
    }
   });
@@ -321,22 +321,30 @@ function renderHome(){
   let runningBal=currentBal;
   const entries=sortedDays.map(day=>{
    const events=dayEvents[day];
-   let dayChg=0;
+   const dateObj=new Date(day);
+   const dateStr=`${dateObj.getMonth()+1}/${dateObj.getDate()}`;
+   
+   let dayBal=runningBal;
    const lines=events.map(e=>{
-    dayChg+=e.type==='income'||e.type==='transfer-in'?e.amt:-e.amt;
+    const changeAmt=e.type==='income'?e.amt:(e.isIncoming?e.amt:-e.amt);
+    dayBal+=changeAmt;
     const isBudgeted=e.type==='budgeted';
-    const isTransfer=e.type==='transfer'||e.type==='transfer-in';
-    const highlightStyle=isTransfer?'background:#fffacd;border-left:3px solid #ffeb3b;padding-left:6px':'';
-    const amtColor=e.type==='income'||e.type==='transfer-in'?'#198754':(e.type==='transfer'?'#d64545':'#d64545');
-    return `<div class="small" style="margin:3px 0;display:grid;grid-template-columns:2fr 1fr;gap:12px;${highlightStyle}"><div><span style="color:${amtColor};font-weight:750">${e.type==='income'||e.type==='transfer-in'?'+':'-'}${money(e.amt)}</span> ${e.label}${isBudgeted?' (budgeted)':''}</div></div>`;
+    const isTransfer=e.type==='transfer';
+    const highlightStyle=isTransfer&&e.highlight?'background:#fffacd;border-left:3px solid #ffeb3b':isBudgeted?'background:#e8e8e8;border-left:3px solid #999':'';
+    let amtColor='#d64545';
+    let amtText='-';
+    if(e.type==='income'){amtColor='#198754';amtText='+';}
+    const isNeg=dayBal<0;
+    
+    return `<div style="display:grid;grid-template-columns:80px 2fr 120px 100px;gap:12px;align-items:center;padding:8px;margin:3px 0;${highlightStyle}"><div style="font-size:11px;font-weight:700">${dateStr}</div><div style="font-size:12px">${e.label}${isBudgeted?' (budgeted)':''}</div><div style="text-align:right;font-weight:750;color:${amtColor}">${amtText}${money(e.amt)}</div><div style="text-align:right;font-size:11px;font-style:italic;color:${isNeg?'#d64545':'var(--muted)'}${isNeg?';font-weight:700':''}">${money(dayBal)}</div></div>`;
    }).join('');
-   runningBal+=dayChg;
-   const isNeg=runningBal<0;
-   const willGoNeg=events.some(e=>e.type==='budgeted'&&runningBal-e.amt<0);
-   return `<div style="margin-top:8px;border-top:1px solid var(--line);padding-top:8px"><div style="font-size:11px;font-weight:700;margin-bottom:4px">${day}</div>${lines}<div style="text-align:right;margin-top:4px;font-size:11px;font-style:italic;color:${isNeg?'#d64545':'var(--muted)'}${isNeg?';font-weight:700':''}">${money(runningBal)}</div>${willGoNeg?`<div style="font-size:10px;color:#666;background:#f0f0f0;padding:4px;border-radius:4px;margin-top:3px">⚠ Low balance</div>`:''}</div>`;
+   runningBal=dayBal;
+   const willGoNeg=events.some(e=>e.type==='budgeted'&&dayBal<0);
+   
+   return `<div>${lines}${willGoNeg?`<div style="font-size:10px;color:#666;background:#f0f0f0;padding:4px;border-radius:4px;margin-top:3px">⚠ Low balance</div>`:''}</div>`;
   }).join('');
   
-  return `<div class="acctile"><div class="label">${a.label}</div><div class="amount" onclick="editAccBalance(${i})">${money(currentBal)}</div><div class="sub">Available balance</div>${entries}</div>`;
+  return `<div class="acctile"><div style="display:grid;grid-template-columns:2fr 1fr;gap:8px;align-items:flex-start;margin-bottom:12px"><div><div class="label">${a.label}</div><div class="sub">Available balance</div></div><div style="text-align:right"><div style="font-size:28px;font-weight:900;cursor:pointer" onclick="editAccBalance(${i})">${money(currentBal)}</div></div></div><div style="font-size:11px;display:grid;grid-template-columns:80px 2fr 120px 100px;gap:12px;font-weight:700;padding-bottom:6px;border-bottom:2px solid var(--line)"><div>Date</div><div>Description</div><div>Amount</div><div style="text-align:right">Balance</div></div>${entries}</div>`;
  }).join('');
 }
 function switchType(t){
