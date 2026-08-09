@@ -286,6 +286,12 @@ function renderHome(){
     dates.forEach(d=>{if(!dayEvents[d])dayEvents[d]=[];dayEvents[d].push({type:'expense',label:bill.label,amt:num(bill.amount)});});
    }
   });
+  state.categories.forEach(cat=>{
+   if(cat.transferFromAccountId===a.id&&cat.transferDate){
+    if(!dayEvents[cat.transferDate])dayEvents[cat.transferDate]=[];
+    dayEvents[cat.transferDate].push({type:'transfer',label:`Transfer to ${state.accounts.find(ac=>ac.id===cat.accountId)?.label||'Account'} (${cat.label})`,amt:num(cat.budget)});
+   }
+  });
   
   const sortedDays=Object.keys(dayEvents).sort().filter(d=>d>=today);
   let runningBal=currentBal;
